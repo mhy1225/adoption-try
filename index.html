@@ -11,16 +11,7 @@
     <link rel="stylesheet" href="style.css">
 
     <style>
-      /* G4 卡片進場動畫 */
-      @keyframes cardEnter {
-        from { opacity: 0; transform: translateY(16px) scale(0.97); }
-        to   { opacity: 1; transform: translateY(0)   scale(1);    }
-      }
-      .card-enter {
-        animation: cardEnter 0.3s ease-out forwards;
-      }
-
-      /* 卡片容器與卡片樣式強制覆蓋 */
+      /* 強制覆蓋卡片樣式確保不透明且置中 */
       #family-cards-container { position: relative; }
       .family-card {
         background: #ffffff !important;
@@ -28,25 +19,24 @@
         -webkit-backdrop-filter: none !important;
         opacity: 1 !important;
         color: #222222 !important;
+        text-align: center;
       }
-      #family-cards-container .pixel-box,
-      #family-cards-container [class*="pixel"],
-      #family-cards-container [class*="card"] {
-        background: #ffffff !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        opacity: 1 !important;
-        color: #222222 !important;
-      }
-      .family-card *, #family-cards-container * { color: #222222 !important; }
+      .family-card *, #family-cards-container * { color: #222222 !important; text-align: center; }
       .family-card strong, #family-cards-container strong { color: #b45309 !important; }
     </style>
 </head>
 <body>
-<div id="app-container">
 
-    <section id="stage-1-result" class="screen-section active" style="min-height: 90vh; display: flex; flex-direction: column; justify-content: center; position: relative;">
-        <div class="pixel-box text-center" style="margin-bottom: 40px;">
+<!-- 全局返回按鈕 -->
+<div id="global-back-btn" class="hidden" style="position: fixed; top: 15px; left: 15px; z-index: 1000; cursor: pointer; background: #fff; border: 2px solid #333; padding: 6px 14px; border-radius: 8px; font-weight: bold; box-shadow: 2px 2px 0px #333; transition: transform 0.1s;">
+    ⭠ 返回
+</div>
+
+<div id="app-container" style="text-align: center;"> <!-- 全局置中 -->
+
+    <!-- ========== Stage 1：數據揭曉 (首頁) ========== -->
+    <section id="stage-1-result" class="screen-section active" style="min-height: 90vh; display: flex; flex-direction: column; justify-content: center; position: relative; text-align: center;">
+        <div class="pixel-box text-center" style="margin-bottom: 40px; display: inline-block;">
             <h1 id="result-feedback" style="font-size: 2.2em; color: #e74c3c; margin-bottom: 20px;">現實，遠比數據沉重</h1>
             <p class="stats-compare" style="font-size: 1.2em;">2025 年只有 <strong>18% (13/77)</strong> 正在找家的特殊兒童，<br>在台灣順利找到屬於他的家。</p>
             <p style="margin-top: 15px; font-size: 0.95em; color: #555; line-height: 1.6;">大眾的預期往往相對樂觀，<br>但體制內的等待，卻是一場沒有盡頭的消耗戰。</p>
@@ -64,23 +54,22 @@
         </div>
     </section>
 
+    <!-- ========== Stage 2：遊戲 ========== -->
     <section id="stage-2" class="screen-section hidden">
-        <div class="game-hud pixel-box">
+        <div class="game-hud pixel-box text-center">
             <span>個案年齡：<span id="child-age">1歲 0個月</span></span>
-            <span class="warning-text hidden" id="age-warning">⚠ 3歲提醒：媒合難度大幅提升 ⚠</span>
+            <span class="warning-text hidden" id="age-warning"><br>⚠ 3歲提醒：媒合難度大幅提升 ⚠</span>
         </div>
 
-        <div id="game-main" class="game-screen active pixel-box">
+        <!-- 遊戲開場 -->
+        <div id="game-main" class="game-screen hidden pixel-box text-center">
             <h2>案件指派</h2>
-            
-            <div class="intro-highlight">
+            <div class="intro-highlight" style="display: inline-block; text-align: center;">
                 <p>你是一名社工。<br>今天，你收到一個個案，這個小孩帶有特殊身心狀況，其母親委託出養。</p>
                 <p>根據國內優先原則，國內出養的黃金時期極為短暫。<br><strong style="color: #e74c3c; font-size: 1.1em;">請在孩子成長到 6 歲前，努力幫孩子尋家。</strong></p>
             </div>
-            
-            <p style="font-size: 0.8em; color: #888; text-align: center; margin-bottom: 20px;">(若想重看首頁數據，可向上滑動返回)</p>
-            
-            <div class="interaction-area text-center">
+            <p style="font-size: 0.8em; color: #888; margin-bottom: 20px;">(可向上滑動或點擊左上角返回前頁)</p>
+            <div class="interaction-area">
                 <div class="scroll-prompt" id="btn-scroll-g1" style="cursor: pointer;">
                     <span style="font-size: 1.5em;">👇</span><br>
                     <strong>向下滑動，開始尋找親屬 (倒數開始)</strong>
@@ -88,20 +77,22 @@
             </div>
         </div>
 
-        <div id="game-g1" class="game-screen pixel-box hidden">
+        <!-- 第一步：尋找親屬 -->
+        <div id="game-g1" class="game-screen pixel-box hidden text-center">
             <h2>第一步：尋找親屬</h2>
-            <div class="pixel-box-inner error-state">
+            <div class="pixel-box-inner error-state" style="display: inline-block;">
                 <p><strong>沒有找到親屬收養。</strong></p>
             </div>
             <p>親屬無力撫養，案件必須進入寄養體系，向外尋求收養家庭。</p>
             <button class="pixel-btn" id="btn-g1-next">安排進入寄養家庭 ➔</button>
         </div>
 
-        <div id="game-g3" class="game-screen pixel-box hidden">
+        <!-- 第二步：寄養家庭生活 -->
+        <div id="game-g3" class="game-screen pixel-box hidden text-center">
             <h2>第二步：寄養家庭的考驗</h2>
             <p>照顧特殊兒的壓力極大，突發狀況不斷。<br><strong>👉 請在 10 秒內瘋狂點擊消除「狀況」，若壓力值達 100% 將導致安置失敗！</strong></p>
             
-            <div id="stress-meter-container" class="hidden">
+            <div id="stress-meter-container" class="hidden" style="max-width: 400px; margin: 0 auto;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
                     <span>寄養家庭壓力值</span>
                     <span id="stress-text">0%</span>
@@ -112,35 +103,36 @@
                 <p id="game-timer-text" style="text-align: right; font-size: 0.9em; margin-top: 5px; color: #666;">剩餘時間：10 秒</p>
             </div>
 
-            <div id="foster-game-area" class="pixel-box-inner hidden" style="height: 220px; position: relative; overflow: hidden; margin-top: 15px; background: #e5e7eb;">
-                </div>
+            <div id="foster-game-area" class="pixel-box-inner hidden" style="height: 220px; position: relative; overflow: hidden; margin-top: 15px; background: #e5e7eb;"></div>
 
-            <div id="foster-result-msg" class="pixel-box-inner hidden"></div>
+            <div id="foster-result-msg" class="pixel-box-inner hidden" style="display: inline-block;"></div>
 
-            <div class="text-center" style="margin-top: 15px;">
+            <div style="margin-top: 15px;">
                 <button class="pixel-btn primary" id="btn-start-foster-game">開始挑戰</button>
                 <button class="pixel-btn hidden" id="btn-g3-to-g4">進入第三步：介紹收養家庭 ➔</button>
             </div>
         </div>
 
-        <div id="game-g4" class="game-screen pixel-box hidden">
+        <!-- 第三步：介紹收養家庭 -->
+        <div id="game-g4" class="game-screen pixel-box hidden text-center">
             <h2>第三步：介紹收養家庭</h2>
             <p>請翻閱以下家庭檔案，評估是否適合收養這名特殊兒童。</p>
             
-            <div id="family-cards-container" class="cards-container"></div>
+            <div id="family-cards-container" class="cards-container" style="max-width: 500px; margin: 0 auto;"></div>
             
             <div class="btn-group" id="g4-action-btns" style="margin-top: 20px;">
                 <button class="pixel-btn primary" id="btn-g4-accept">⭕ 適合 (蓋章翻頁)</button>
                 <button class="pixel-btn secondary" id="btn-g4-reject">❌ 不適合 (蓋章翻頁)</button>
             </div>
 
-            <div id="g4-complete-area" class="text-center hidden">
+            <div id="g4-complete-area" class="hidden">
                 <p>所有家庭評估完畢。</p>
                 <button class="pixel-btn" id="btn-g4-to-g5">進入第四步：審查評估 ➔</button>
             </div>
         </div>
 
-        <div id="game-g5" class="game-screen pixel-box hidden">
+        <!-- 第四步：審查評估 -->
+        <div id="game-g5" class="game-screen pixel-box hidden text-center">
             <h2>第四步：進入審查評估</h2>
             <p><strong>耗時增加：+<span id="g5-n-value">0</span> 乘以 3 個月</strong></p>
             <p>每個被判斷適合收養的家庭，都要花時間做一系列的審查：<br><strong>上課、會談、家訪、調查。</strong></p>
@@ -148,29 +140,32 @@
             <button class="pixel-btn" id="btn-g5-to-g6">審查結束，進入程序 ➔</button>
         </div>
 
-        <div id="game-g6" class="game-screen pixel-box hidden">
+        <!-- 第五步：收養程序 -->
+        <div id="game-g6" class="game-screen pixel-box hidden text-center">
             <h2>第五步：進入收養程序 (倒計時停止)</h2>
             <p>這是一條漫長的路，為了確保孩子的最佳利益，必須依次完成法定程序：</p>
             
-            <div style="display: flex; flex-direction: column; gap: 15px; margin: 20px 0;">
-                <button class="pixel-btn process-btn" id="btn-proc-1">1. 試養</button>
-                <button class="pixel-btn process-btn" id="btn-proc-2" disabled style="opacity: 0.5;">2. 評估</button>
-                <button class="pixel-btn process-btn" id="btn-proc-3" disabled style="opacity: 0.5;">3. 法院聲請許可</button>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0;">
+                <button class="pixel-btn process-btn" id="btn-proc-1" style="width: 200px;">1. 試養</button>
+                <button class="pixel-btn process-btn" id="btn-proc-2" disabled style="opacity: 0.5; width: 200px;">2. 評估</button>
+                <button class="pixel-btn process-btn" id="btn-proc-3" disabled style="opacity: 0.5; width: 200px;">3. 法院聲請許可</button>
             </div>
 
-            <div class="pixel-box-inner hidden" id="g6-msg"></div>
+            <div class="pixel-box-inner hidden" id="g6-msg" style="display: inline-block;"></div><br>
 
             <button class="pixel-btn primary hidden" id="btn-g6-to-r">查看最終結局 ➔</button>
         </div>
 
-        <div id="game-r1" class="game-screen pixel-box error-state hidden">
+        <!-- R1：失敗結局 -->
+        <div id="game-r1" class="game-screen pixel-box error-state hidden text-center">
             <h2>R1 結局：尋家失敗</h2>
             <p>1. 孩子滿 6 歲了... 你錯過了合適的家庭。</p>
             <p>2. 你沒能在黃金境內收養期內幫孩子找到家。在台灣，3歲以上的特殊兒童媒合率便會雪崩式下滑，滿 6 歲後，國內家庭的收養意願幾乎為零。</p>
             <button class="pixel-btn primary btn-to-stage-3">閱讀完整報導</button>
         </div>
 
-        <div id="game-r2" class="game-screen pixel-box success-state-border hidden">
+        <!-- R2：成功結局 -->
+        <div id="game-r2" class="game-screen pixel-box success-state-border hidden text-center">
             <h2>R2 結局：成功找到國內收養家庭</h2>
             <p>你成功幫孩子找到家了！</p>
             <p><strong>但在實際情況中，這只是少數...</strong></p>
@@ -179,15 +174,16 @@
         </div>
     </section>
 
-    <section id="stage-3" class="screen-section hidden">
+    <!-- ========== Stage 3：報導 ========== -->
+    <section id="stage-3" class="screen-section hidden text-center">
         <div class="parallax-section header-parallax">
-            <div class="pixel-box">
+            <div class="pixel-box" style="display: inline-block;">
                 <h1>家還有多遠？</h1>
                 <h2>特殊兒童收養困境下的漫漫長路</h2>
             </div>
         </div>
 
-        <article class="article-content">
+        <article class="article-content" style="max-width: 600px; margin: 0 auto;">
             <div class="text-block">
                 <h3>「我並不是為了領養一個小孩而去領養，而是剛好遇到我女兒。」</h3>
                 <p>坐在自家經營的藥局內，貝貝媽回想起十八年前與女兒相遇的過程。當時她在基金會擔任週末寄養家庭義工，將才四個月大、因生父母藥癮而成為「毒寶寶」的貝貝帶回家。她說：「一年前她還做不到在非固定地點下車，現在她已經可以應對不同的紅綠燈去實習了。這就是她的進步。」</p>
@@ -199,20 +195,20 @@
             </div>
         </article>
 
-        <article class="article-content" style="background-color: #f0f4f8;">
+        <article class="article-content" style="background-color: #f0f4f8; max-width: 600px; margin: 0 auto;">
             <div class="text-block">
                 <span class="eyebrow">困境一：資源與補助的落差</span>
                 <p>目前台灣的補助並未區分一般兒童與收養兒童，兩者的資源與金額大致相同，難以反映在照顧成本與需求上的差異。對於涉及醫療復健、心理支持與教育輔導的特殊兒童而言，這樣的制度設計無疑加重了收養家庭的負擔。</p>
                 <p>蘇淑霞指出，現行收養制度缺乏相應配套，難以回應實際需求，他說道：「在國外收養特殊兒童，反而是一種優勢，因為整個社區與政府都會一起分擔照顧責任。」</p>
             </div>
 
-            <div class="quote-block pixel-box">
+            <div class="quote-block pixel-box" style="display: inline-block;">
                 <p>「在台灣現行制度下，收養家庭的定位尚未明確——究竟應被視為一般家庭，還是執行永久安置功能、需要國家特別支持的家庭？這個問題若無法釐清，補助政策便難以對症下藥。」</p>
-                <span>—— 陳玉楨，勵馨基金會台北分所主任</span>
+                <span style="text-align: center;">—— 陳玉楨，勵馨基金會台北分所主任</span>
             </div>
         </article>
         
-        <article class="article-content">
+        <article class="article-content" style="max-width: 600px; margin: 0 auto;">
             <div class="text-block">
                 <span class="eyebrow">困境二：職場支援法規的脫節</span>
                 <p>除了經濟壓力，現行的職場支援法規也讓收養家庭感到疲於奔命。目前台灣的育嬰留職停薪僅適用於三歲以下的幼童，但許多大齡兒童在媒合成功時往往已超過三歲，這導致家長在孩子最需要建立依附關係的初期，卻無法請假陪伴。</p>
