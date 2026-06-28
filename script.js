@@ -155,7 +155,7 @@ function startFosterGame() {
         }
     }, 1000);
 
-    // 每 50 毫秒增加 1 點壓力（相當於每秒平滑增加 20 點）
+    // 每 33 毫秒增加 1 點壓力（相當於每秒精確增加 ~30 點）
     stressIncreaseInterval = setInterval(() => {
         stressLevel += 1;
         if (stressLevel >= 100) {
@@ -165,9 +165,9 @@ function startFosterGame() {
         } else {
             updateStressUI();
         }
-    }, 50);
+    }, 33);
 
-    // 為了平衡高達每秒20的扣分，泡泡的產生速度稍稍加快到每0.4秒一顆
+    // 泡泡產生速度調至每0.2秒一顆，確保玩家極限點擊能存活
     spawnInterval = setInterval(() => {
         if (stressLevel >= 100 || gameTimer <= 0) return;
 
@@ -183,13 +183,11 @@ function startFosterGame() {
         bubble.addEventListener('mousedown', function onBubbleClick() {
             bubble.removeEventListener('mousedown', onBubbleClick);
             
-            // 加入破裂動畫 class
             bubble.classList.add('popped');
             
             stressLevel = Math.max(0, stressLevel - 5);
             updateStressUI();
             
-            // 動畫時長設定為 0.2s，播完移除
             setTimeout(() => {
                 if (area.contains(bubble)) {
                     bubble.remove();
@@ -203,8 +201,8 @@ function startFosterGame() {
             if (area.contains(bubble) && !bubble.classList.contains('popped')) {
                 bubble.remove();
             }
-        }, 2000);
-    }, 400); 
+        }, 1500); // 未點擊的泡泡 1.5 秒後消失
+    }, 200); 
 }
 
 
@@ -298,27 +296,45 @@ function swipeCard(direction) {
   }, 300);
 }
 
-// ---------- 事件綁定 ----------
-document.addEventListener('DOMContentLoaded', () => {
-
-  const slider = document.getElementById('guess-slider');
-  const sliderDisplay = document.getElementById('slider-display');
-
-  if (slider && sliderDisplay) {
-    slider.addEventListener('input', () => {
-      sliderDisplay.textContent = slider.value;
-    });
-  }
-
-  document.getElementById('btn-submit-guess')?.addEventListener('click', () => {
-    showScreen('stage-1-result');
-  });
-
-  document.getElementById('btn-to-stage-2')?.addEventListener('click', () => {
+// ---------- 事件綁定與頁面切換控制 ----------
+let hasScrolledToGame = false;
+function goToStage2() {
+    if (hasScrolledToGame) return;
+    hasScrolledToGame = true;
     showScreen('stage-2');
     showGameScreen('game-main');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  // --- 首頁下滑/點擊進入遊戲邏輯 ---
+  document.getElementById('btn-scroll-down')?.addEventListener('click', goToStage2);
+
+  window.addEventListener('wheel', (e) => {
+      const resultPage = document.getElementById('stage-1-result');
+      if (resultPage && resultPage.classList.contains('active')) {
+          if (e.deltaY > 15) { // 稍微滾動即觸發
+              goToStage2();
+          }
+      }
   });
 
+  let touchStartY = 0;
+  window.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+  });
+  window.addEventListener('touchend', (e) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      const resultPage = document.getElementById('stage-1-result');
+      if (resultPage && resultPage.classList.contains('active')) {
+          if (touchStartY - touchEndY > 40) { // 偵測向上滑動(畫面往下)
+              goToStage2();
+          }
+      }
+  });
+
+
+  // --- 各區塊按鈕綁定 ---
   document.querySelectorAll('.btn-to-stage-3').forEach(btn => {
     btn.addEventListener('click', () => {
       showScreen('stage-3');
@@ -335,12 +351,10 @@ document.addEventListener('DOMContentLoaded', () => {
     showGameScreen('game-g3');
   });
 
-  // 第二步：開始寄養生存遊戲
   document.getElementById('btn-start-foster-game')?.addEventListener('click', () => {
     startFosterGame();
   });
 
-  // 第三步切換
   document.getElementById('btn-g3-to-g4')?.addEventListener('click', () => {
     showGameScreen('game-g4');
     gameState.currentCardIndex = 0;
@@ -371,7 +385,6 @@ document.addEventListener('DOMContentLoaded', () => {
     showGameScreen('game-g6');
   });
 
-  // === 第五步：程序連動按鈕 ===
   const btnProc1 = document.getElementById('btn-proc-1');
   const btnProc2 = document.getElementById('btn-proc-2');
   const btnProc3 = document.getElementById('btn-proc-3');
@@ -409,7 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 
-  // 最終結局按鈕
   btnG6ToR?.addEventListener('click', () => {
     if (gameState.acceptedFamilies > 0) {
       showGameScreen('game-r2');
