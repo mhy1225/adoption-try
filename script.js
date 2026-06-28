@@ -95,8 +95,10 @@ function stopAgeTimer() {
 // ---------- 第二步：寄養家庭壓力小遊戲 ----------
 let stressLevel = 0;
 let gameTimer = 10;
-let spawnInterval, countdownInterval;
-const crises = ["急診發燒", "早療排不到", "情緒失控", "寄養媽生病", "半夜哭鬧", "鄰居抗議"];
+let spawnInterval, countdownInterval, stressIncreaseInterval;
+
+// 更新陣列：移除鄰居抗議，新增加班、家長生病
+const crises = ["急診發燒", "早療排不到", "情緒失控", "半夜哭鬧", "加班", "家長生病"];
 
 function updateStressUI() {
     const bar = document.getElementById('stress-bar');
@@ -112,6 +114,8 @@ function updateStressUI() {
 function endFosterGame(isWin) {
     clearInterval(spawnInterval);
     clearInterval(countdownInterval);
+    clearInterval(stressIncreaseInterval);
+    
     document.getElementById('foster-game-area').innerHTML = ''; // 清除所有泡泡
     document.getElementById('foster-game-area').classList.add('hidden');
     
@@ -143,7 +147,7 @@ function startFosterGame() {
     
     const area = document.getElementById('foster-game-area');
     
-    // 倒數計時器
+    // 倒數 10 秒
     countdownInterval = setInterval(() => {
         gameTimer--;
         document.getElementById('game-timer-text').innerText = `剩餘時間：${gameTimer} 秒`;
@@ -152,42 +156,61 @@ function startFosterGame() {
         }
     }, 1000);
 
-    // 產生危機泡泡
+    // 每秒固定增加 10 點壓力
+    stressIncreaseInterval = setInterval(() => {
+        stressLevel += 10;
+        if (stressLevel >= 100) {
+            stressLevel = 100;
+            updateStressUI();
+            endFosterGame(false); // 爆表失敗
+        } else {
+            updateStressUI();
+        }
+    }, 1000);
+
+    // 每 0.5 秒產生一個危機泡泡，讓玩家瘋狂點擊
     spawnInterval = setInterval(() => {
-        if (stressLevel >= 100) return; // 已爆表
+        if (stressLevel >= 100 || gameTimer <= 0) return;
 
         const bubble = document.createElement('div');
         bubble.className = 'stress-bubble';
         bubble.innerText = crises[Math.floor(Math.random() * crises.length)];
         
-        // 隨機位置 (確保不會超出邊界)
+        // 隨機位置 (預留邊界避免超出版面)
         const maxX = area.clientWidth - 100;
         const maxY = area.clientHeight - 40;
         bubble.style.left = `${Math.floor(Math.random() * maxX)}px`;
         bubble.style.top = `${Math.floor(Math.random() * maxY)}px`;
 
-        // 點擊消除
-        bubble.addEventListener('mousedown', () => {
-            bubble.remove();
+        // 點擊消除：減少 5 點壓力並播放破裂動畫
+        bubble.addEventListener('mousedown', function onBubbleClick() {
+            // 避免連點
+            bubble.removeEventListener('mousedown', onBubbleClick);
+            
+            // 加上破裂動畫 class
+            bubble.classList.add('popped');
+            
+            // 扣除壓力值，最低不低於 0
+            stressLevel = Math.max(0, stressLevel - 5);
+            updateStressUI();
+            
+            // 動畫播完後移除該元素 (配合 CSS 0.2s)
+            setTimeout(() => {
+                if (area.contains(bubble)) {
+                    bubble.remove();
+                }
+            }, 200);
         });
 
         area.appendChild(bubble);
 
-        // 如果 2.5 秒內沒點擊消除，壓力增加
+        // 如果泡泡 2 秒內沒被點掉就自動消失，不額外扣分
         setTimeout(() => {
-            if (area.contains(bubble)) {
+            if (area.contains(bubble) && !bubble.classList.contains('popped')) {
                 bubble.remove();
-                stressLevel += 25; 
-                if (stressLevel >= 100) {
-                    stressLevel = 100;
-                    updateStressUI();
-                    endFosterGame(false); // 壓力滿，失敗
-                } else {
-                    updateStressUI();
-                }
             }
         }, 2000);
-    }, 900); // 每 0.9 秒出現一個
+    }, 500); 
 }
 
 
