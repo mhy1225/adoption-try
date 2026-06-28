@@ -5,17 +5,17 @@
 const familyCases = [
     { 
         id: 1, 
-        title: "收養家庭檔案 (1/3)", 
+        title: "收養檔案號：001", 
         content: "<strong>【高社經菁英家庭】</strong><br><strong>背景：</strong>先生（45歲）為科技業副總，太太（42歲）為外商銀行高管。年收破千萬，居住於市中心豪宅，並已預先聘請全職保母。<br><strong>收養動機：</strong>經歷多年不孕，認為自身擁有頂級資源，能給予孩子最好的醫療與教育。<br><strong>社工評估筆記：</strong>夫妻雙方皆處於極高壓、長工時的環境，且表示無法配合請育嬰假。面對特殊兒密集的早療需求，他們傾向「花錢請專業保母與看護解決」，期待孩子能透過醫療跟上一般人的發展標準。" 
     },
     { 
         id: 2, 
-        title: "收養家庭檔案 (2/3)", 
+        title: "收養檔案號：002", 
         content: "<strong>【雙薪彈性辦公家庭】</strong><br><strong>背景：</strong>先生（41歲）為遠距工作的接案工程師，太太（39歲）為兼職會計。兩人收入中等但財務規劃穩健，居住於有電梯的社區大樓。<br><strong>收養動機：</strong>結婚 8 年未生育，兩年前開始接觸特殊兒早療志工服務，深刻理解「進步不是直線的」，願意以孩子的步調為中心。<br><strong>社工評估筆記：</strong>家庭展現出極高的<strong>「包容度」與「工作彈性」</strong>。先生的遠端工作型態能隨時機動配合每週數次的醫院復健與早療課程；太太已計畫在收養初期的前兩年轉為全職，專心與孩子建立安全依附關係。他們在會談中表示，不期待孩子變得「正常」，而是準備好陪孩子面對真實的人生。" 
     },
     { 
         id: 3, 
-        title: "收養家庭檔案 (3/3)", 
+        title: "收養檔案號：003", 
         content: "<strong>【傳統大家族企業】</strong><br><strong>背景：</strong>先生（38歲）為中南部傳統傳產接班人，與父母及親戚同住透天別墅。太太（36歲）為全職家庭主婦。<br><strong>收養動機：</strong>結婚 7 年無子，面臨家族長輩龐大的傳宗接代壓力，妥協轉而尋求收養。<br><strong>社工評估筆記：</strong>主要照顧者（太太）承受極大家族壓力，收養動機參雜了「穩固家庭地位」的考量。此外，同住的長輩對「特殊身心狀況」仍帶有傳統偏見，認為是「業障」或「有失顏面」。在這種環境下，特殊兒童極易成為家族矛盾的導火線，缺乏被無條件接納的空間。" 
     }
 ];
@@ -134,6 +134,37 @@ function endFosterGame(isWin) {
     document.getElementById('btn-g3-to-g4').classList.remove('hidden');
 }
 
+// 抽取單一生成泡泡的函式，確保一開始能跟壓力同步啟動
+function spawnSingleBubble(area) {
+    const bubble = document.createElement('div');
+    bubble.className = 'stress-bubble';
+    bubble.innerText = crises[Math.floor(Math.random() * crises.length)];
+    
+    const maxX = area.clientWidth - 100;
+    const maxY = area.clientHeight - 40;
+    bubble.style.left = `${Math.floor(Math.random() * maxX)}px`;
+    bubble.style.top = `${Math.floor(Math.random() * maxY)}px`;
+
+    bubble.addEventListener('mousedown', function onBubbleClick() {
+        bubble.removeEventListener('mousedown', onBubbleClick);
+        bubble.classList.add('popped');
+        stressLevel = Math.max(0, stressLevel - 5);
+        updateStressUI();
+        
+        setTimeout(() => {
+            if (area.contains(bubble)) bubble.remove();
+        }, 200);
+    });
+
+    area.appendChild(bubble);
+
+    setTimeout(() => {
+        if (area.contains(bubble) && !bubble.classList.contains('popped')) {
+            bubble.remove();
+        }
+    }, 1500);
+}
+
 function startFosterGame() {
     stressLevel = 0;
     gameTimer = 10;
@@ -155,7 +186,7 @@ function startFosterGame() {
         }
     }, 1000);
 
-    // 每 33 毫秒增加 1 點壓力（相當於每秒精確增加 ~30 點）
+    // 每 33 毫秒增加 1 點壓力（相當於 1 秒均速精確增加 ~30 點）
     stressIncreaseInterval = setInterval(() => {
         stressLevel += 1;
         if (stressLevel >= 100) {
@@ -167,46 +198,18 @@ function startFosterGame() {
         }
     }, 33);
 
-    // 泡泡產生速度調至每0.2秒一顆，確保玩家極限點擊能存活
+    // 同時啟動第一顆泡泡
+    spawnSingleBubble(area);
+
+    // 泡泡產生速度調至每0.2秒一顆，考驗極限手速
     spawnInterval = setInterval(() => {
         if (stressLevel >= 100 || gameTimer <= 0) return;
-
-        const bubble = document.createElement('div');
-        bubble.className = 'stress-bubble';
-        bubble.innerText = crises[Math.floor(Math.random() * crises.length)];
-        
-        const maxX = area.clientWidth - 100;
-        const maxY = area.clientHeight - 40;
-        bubble.style.left = `${Math.floor(Math.random() * maxX)}px`;
-        bubble.style.top = `${Math.floor(Math.random() * maxY)}px`;
-
-        bubble.addEventListener('mousedown', function onBubbleClick() {
-            bubble.removeEventListener('mousedown', onBubbleClick);
-            
-            bubble.classList.add('popped');
-            
-            stressLevel = Math.max(0, stressLevel - 5);
-            updateStressUI();
-            
-            setTimeout(() => {
-                if (area.contains(bubble)) {
-                    bubble.remove();
-                }
-            }, 200);
-        });
-
-        area.appendChild(bubble);
-
-        setTimeout(() => {
-            if (area.contains(bubble) && !bubble.classList.contains('popped')) {
-                bubble.remove();
-            }
-        }, 1500); // 未點擊的泡泡 1.5 秒後消失
+        spawnSingleBubble(area);
     }, 200); 
 }
 
 
-// ---------- 第三步：卡片渲染 ----------
+// ---------- 第三步：卡片渲染 (筆記本風格) ----------
 function renderCurrentCard() {
   const container = document.getElementById('family-cards-container');
   if (!container) return;
@@ -221,83 +224,74 @@ function renderCurrentCard() {
   const family = familyCases[gameState.currentCardIndex];
 
   container.innerHTML = `
-    <div class="family-card" style="
-      background-color: #ffffff !important;
-      background: #ffffff !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      opacity: 1 !important;
-      border: 2px solid #333333;
-      border-radius: 8px;
-      padding: 20px;
-      margin: 10px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      color: #222222;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      position: relative;
-      z-index: 10;
-    ">
-      <div style="
-        color: #b45309 !important;
-        font-weight: bold;
-        margin-bottom: 12px;
-        font-size: 0.95em;
-      ">
-        ${family.title}
-      </div>
-      <div style="
-        color: #222222 !important;
-        line-height: 1.7;
-        font-size: 0.95em;
-      ">
-        ${family.content}
-      </div>
+    <div class="family-card">
+      <div class="notebook-title">${family.title}</div>
+      <div class="notebook-content">${family.content}</div>
     </div>
   `;
-
-  setTimeout(() => {
-    const card = container.querySelector('.family-card');
-    if (card) {
-      card.querySelectorAll('p, span, div, strong, em').forEach(el => {
-        el.style.setProperty('color', '#222222', 'important');
-        el.style.setProperty('opacity', '1', 'important');
-      });
-      card.querySelectorAll('strong').forEach(el => {
-        el.style.setProperty('color', '#b45309', 'important');
-      });
-    }
-  }, 0);
-
-  const card = container.querySelector('.family-card');
-  if (card) {
-    card.classList.add('card-enter');
-  }
 }
 
-function swipeCard(direction) {
+// 蓋章與翻頁動畫
+function swipeCard(isAccepted) {
   const container = document.getElementById('family-cards-container');
   const card = container ? container.querySelector('.family-card') : null;
 
   if (card) {
-    card.style.transform = direction === 'left'
-      ? 'translateX(-120%) rotate(-10deg)'
-      : 'translateX(120%) rotate(10deg)';
-    card.style.opacity = '0';
+    // 產生審核印章
+    const stamp = document.createElement('div');
+    stamp.style.position = 'absolute';
+    stamp.style.top = '40%';
+    stamp.style.left = '50%';
+    stamp.style.transform = 'translate(-50%, -50%) rotate(-15deg) scale(2)';
+    stamp.style.fontSize = '2.5rem';
+    stamp.style.fontWeight = 'bold';
+    stamp.style.border = '5px solid';
+    stamp.style.padding = '10px 25px';
+    stamp.style.borderRadius = '15px';
+    stamp.style.zIndex = '100';
+    stamp.style.opacity = '0';
+    stamp.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    stamp.style.fontFamily = 'monospace';
+    stamp.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+    
+    if (isAccepted) {
+        stamp.innerText = '適 合';
+        stamp.style.color = '#2ecc71';
+        stamp.style.borderColor = '#2ecc71';
+    } else {
+        stamp.innerText = '不適合';
+        stamp.style.color = '#e74c3c';
+        stamp.style.borderColor = '#e74c3c';
+    }
+    card.appendChild(stamp);
+    
+    // 蓋章特效
+    setTimeout(() => {
+        stamp.style.opacity = '1';
+        stamp.style.transform = 'translate(-50%, -50%) rotate(-5deg) scale(1)';
+    }, 10);
+
+    // 0.6 秒後將整頁向左翻開
+    setTimeout(() => {
+        card.style.transform = 'rotateY(-130deg)';
+        card.style.opacity = '0';
+    }, 600);
   }
 
   setTimeout(() => {
-    if (direction === 'left') {
+    if (isAccepted) {
       gameState.acceptedFamilies++;
     } else {
       gameState.rejectedFamilies++;
     }
     gameState.currentCardIndex++;
     renderCurrentCard();
-  }, 300);
+  }, 1100);
 }
 
-// ---------- 事件綁定與頁面切換控制 ----------
+// ---------- 事件綁定與上下滑動控制 ----------
 let hasScrolledToGame = false;
+
 function goToStage2() {
     if (hasScrolledToGame) return;
     hasScrolledToGame = true;
@@ -305,20 +299,35 @@ function goToStage2() {
     showGameScreen('game-main');
 }
 
+function goToStage1() {
+    if (!hasScrolledToGame) return;
+    hasScrolledToGame = false;
+    showScreen('stage-1-result');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
-  // --- 首頁下滑/點擊進入遊戲邏輯 ---
+  // --- 首頁下滑/上滑切換邏輯 ---
   document.getElementById('btn-scroll-down')?.addEventListener('click', goToStage2);
 
+  // 滑鼠滾輪
   window.addEventListener('wheel', (e) => {
       const resultPage = document.getElementById('stage-1-result');
+      const stage2 = document.getElementById('stage-2');
+      const gameMain = document.getElementById('game-main');
+
       if (resultPage && resultPage.classList.contains('active')) {
-          if (e.deltaY > 15) { // 稍微滾動即觸發
+          if (e.deltaY > 15) { // 下滑進入遊戲
               goToStage2();
+          }
+      } else if (stage2 && stage2.classList.contains('active') && gameMain && gameMain.classList.contains('active')) {
+          if (e.deltaY < -15) { // 上滑回到首頁
+              goToStage1();
           }
       }
   });
 
+  // 手機觸控滑動
   let touchStartY = 0;
   window.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
@@ -326,13 +335,19 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('touchend', (e) => {
       const touchEndY = e.changedTouches[0].clientY;
       const resultPage = document.getElementById('stage-1-result');
+      const stage2 = document.getElementById('stage-2');
+      const gameMain = document.getElementById('game-main');
+
       if (resultPage && resultPage.classList.contains('active')) {
-          if (touchStartY - touchEndY > 40) { // 偵測向上滑動(畫面往下)
+          if (touchStartY - touchEndY > 40) { // 畫面上移 (向下滑動)
               goToStage2();
+          }
+      } else if (stage2 && stage2.classList.contains('active') && gameMain && gameMain.classList.contains('active')) {
+          if (touchEndY - touchStartY > 40) { // 畫面下移 (向上滑動)
+              goToStage1();
           }
       }
   });
-
 
   // --- 各區塊按鈕綁定 ---
   document.querySelectorAll('.btn-to-stage-3').forEach(btn => {
@@ -364,11 +379,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('btn-g4-accept')?.addEventListener('click', () => {
-    swipeCard('left');
+    swipeCard(true);
   });
 
   document.getElementById('btn-g4-reject')?.addEventListener('click', () => {
-    swipeCard('right');
+    swipeCard(false);
   });
 
   document.getElementById('btn-g4-to-g5')?.addEventListener('click', () => {
