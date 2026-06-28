@@ -93,6 +93,7 @@ function initScreen(id) {
         document.getElementById('g4-action-btns').classList.remove('hidden');
         renderCurrentCard();
         
+        // 從再玩一次/重新遊戲回來時，若尚未失敗且無計時器，則重新啟動計時
         if (!gameState.ageTimerInterval && !gameState.gameFailed) {
             startAgeTimer();
         }
@@ -112,15 +113,11 @@ function initScreen(id) {
             }
         });
         document.getElementById('btn-g5-to-g6').classList.add('hidden');
-        ['narrative-eval-1','narrative-eval-2','narrative-eval-3','narrative-eval-4'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
-        });
     }
     if (id === 'game-g6') {
         document.getElementById('g6-end-actions').classList.add('hidden');
         
-        // 若全部拒絕 (在第二步被攔截)
+        // 若全部拒絕 (在第三步被攔截) 
         if (gameState.acceptedFamilies === 0 && !gameState.gameFailed) {
             document.getElementById('g6-title').innerText = "最終結局";
             document.getElementById('g6-subtitle').classList.add('hidden');
@@ -144,6 +141,7 @@ function initScreen(id) {
         } 
         // 正常進入收養程序
         else if (!gameState.gameFailed) {
+            document.getElementById('g6-title').innerText = "第四步：進入收養程序";
             document.getElementById('g6-subtitle').classList.remove('hidden');
             document.getElementById('g6-process-buttons').classList.remove('hidden');
             ['btn-proc-1', 'btn-proc-2', 'btn-proc-3'].forEach(b => {
@@ -160,12 +158,11 @@ function initScreen(id) {
                 }
             });
             document.getElementById('g6-msg').classList.add('hidden');
-        const popup = document.getElementById('eval-form-popup');
-        if (popup) popup.classList.add('hidden');
         }
     }
 }
 
+// 顯示結局按鈕
 function showEndActions(replayText) {
     document.getElementById('g6-end-actions').classList.remove('hidden');
     document.getElementById('btn-replay-game').innerText = replayText;
@@ -206,6 +203,8 @@ function updateAgeDisplay() {
   if (gameState.childAgeMonths >= 72 && !gameState.gameFailed) {
     gameState.gameFailed = true;
     stopAgeTimer();
+    // 將所有未達條件的人送往未媒合結局(在G6顯示)
+    gameState.acceptedFamilies = 0; 
     triggerTimeoutOutcome();
   }
 }
@@ -333,19 +332,17 @@ function renderCurrentCard() {
 
   if (gameState.currentCardIndex >= familyCases.length) {
     container.innerHTML = '';
-    document.getElementById('g4-action-btns').classList.add('hidden');
-
-    // 立即隱藏整個 game-g4 外框，避免純文字殘影
-    const g4 = document.getElementById('game-g4');
-    if (g4) { g4.classList.remove('active'); g4.classList.add('hidden'); }
-
+    
+    // 如果全都拒絕，直接跳到 G6 (未媒合結局)
     if (gameState.acceptedFamilies === 0) {
+        document.getElementById('g4-action-btns').classList.add('hidden');
         setTimeout(() => {
             stopAgeTimer();
             navigateTo('stage-2', 'game-g6');
         }, 500);
         return;
     } else {
+        document.getElementById('g4-action-btns').classList.add('hidden');
         setTimeout(() => {
             navigateTo('stage-2', 'game-g5');
         }, 500);
@@ -425,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-scroll-down')?.addEventListener('click', () => navigateTo('stage-2', 'game-main'));
 
+  // 電腦滾輪：只允許在首頁下滑進入遊戲
   window.addEventListener('wheel', (e) => {
       if (isNavigating) return;
       if (currentSectionId === 'stage-1-result' && e.deltaY > 30) {
@@ -432,6 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 
+  // 手機觸控：只允許在首頁下滑進入遊戲
   let touchStartY = 0;
   window.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
@@ -444,10 +443,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 
-  // 統一連至報導
+  // 移除所有舊網址，更新為去除 #s3 的新網址
   document.querySelectorAll('.btn-to-stage-3').forEach(btn => {
     btn.addEventListener('click', () => {
-      window.location.href = 'https://ceuwan1113-sys.github.io/05292/#s3';
+      window.location.href = 'https://ceuwan1113-sys.github.io/05292/';
     });
   });
 
@@ -469,36 +468,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnEval4 = document.getElementById('btn-eval-4');
   const btnG5ToG6 = document.getElementById('btn-g5-to-g6');
 
-  function showNarrative(id) {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove('hidden');
-  }
-
   btnEval1?.addEventListener('click', () => {
       btnEval1.classList.add('btn-pressed');
-      gameState.childAgeMonths += 2; updateAgeDisplay();
-      showNarrative('narrative-eval-1');
+      gameState.childAgeMonths += 3; updateAgeDisplay();
       if (btnEval2) { btnEval2.disabled = false; btnEval2.style.opacity = '1'; }
   });
 
   btnEval2?.addEventListener('click', () => {
       btnEval2.classList.add('btn-pressed');
-      gameState.childAgeMonths += 2; updateAgeDisplay();
-      showNarrative('narrative-eval-2');
+      gameState.childAgeMonths += 3; updateAgeDisplay();
       if (btnEval3) { btnEval3.disabled = false; btnEval3.style.opacity = '1'; }
   });
 
   btnEval3?.addEventListener('click', () => {
       btnEval3.classList.add('btn-pressed');
-      gameState.childAgeMonths += 2; updateAgeDisplay();
-      showNarrative('narrative-eval-3');
+      gameState.childAgeMonths += 3; updateAgeDisplay();
       if (btnEval4) { btnEval4.disabled = false; btnEval4.style.opacity = '1'; }
   });
 
   btnEval4?.addEventListener('click', () => {
       btnEval4.classList.add('btn-pressed');
       gameState.childAgeMonths += 3; updateAgeDisplay();
-      showNarrative('narrative-eval-4');
       if (btnG5ToG6) { btnG5ToG6.classList.remove('hidden'); }
   });
 
@@ -517,33 +507,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnProc1?.addEventListener('click', () => {
       btnProc1.classList.add('btn-pressed');
-      showNarrative('narrative-proc-1');
-      if (btnProc2) {
-          btnProc2.disabled = false;
-          btnProc2.style.opacity = '1';
-          // enable hover popup now that button is active
-          const popup = document.getElementById('eval-form-popup');
-          if (popup) popup.classList.remove('hidden');
-      }
+      if (btnProc2) { btnProc2.disabled = false; btnProc2.style.opacity = '1'; }
   });
 
   btnProc2?.addEventListener('click', () => {
       btnProc2.classList.add('btn-pressed');
-      showNarrative('narrative-proc-2');
       if (btnProc3) { btnProc3.disabled = false; btnProc3.style.opacity = '1'; }
   });
 
   btnProc3?.addEventListener('click', () => {
       btnProc3.classList.add('btn-pressed');
-      // Show age reminder before outcome
-      const ageYears = Math.floor(gameState.childAgeMonths / 12);
-      const ageMons = gameState.childAgeMonths % 12;
-      const ageReminderEl = document.createElement('div');
-      ageReminderEl.className = 'eval-narrative';
-      ageReminderEl.style.maxWidth = '420px';
-      ageReminderEl.style.margin = '10px auto';
-      ageReminderEl.innerHTML = `⚖️ 聲請書送出，法院平均處理時間：3–6 個月。<br><strong style="color:#e74c3c;">孩子現在 ${ageYears} 歲 ${ageMons} 個月了。</strong>`;
-      btnProc3.parentElement.appendChild(ageReminderEl);
       
       const isPerfectMatch = (gameState.choices[0] === false && gameState.choices[1] === true && gameState.choices[2] === false);
 
