@@ -76,6 +76,11 @@ function cleanupScreen(id) {
     }
 }
 
+function showNarrative(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
+}
+
 function initScreen(id) {
     if (id === 'game-g3' && !gameState.ageTimerInterval && !gameState.gameFailed) {
         startAgeTimer();
@@ -111,14 +116,24 @@ function initScreen(id) {
                 }
             }
         });
-        document.getElementById('btn-g5-to-g6').classList.add('hidden');
-        ['narrative-eval-1','narrative-eval-2','narrative-eval-3','narrative-eval-4'].forEach(id => {
-            const el = document.getElementById(id);
+        ['narrative-eval-1', 'narrative-eval-2', 'narrative-eval-3', 'narrative-eval-4'].forEach(nid => {
+            const el = document.getElementById(nid);
             if (el) el.classList.add('hidden');
         });
+        document.getElementById('btn-g5-to-g6').classList.add('hidden');
     }
     if (id === 'game-g6') {
         document.getElementById('g6-end-actions').classList.add('hidden');
+        
+        // 隱藏所有敘事與表格
+        ['narrative-proc-1', 'narrative-proc-2'].forEach(nid => {
+            const el = document.getElementById(nid);
+            if (el) el.classList.add('hidden');
+        });
+        const popup = document.getElementById('eval-form-popup');
+        if (popup) popup.classList.add('hidden');
+        const proc3Reminder = document.getElementById('narrative-proc-3');
+        if(proc3Reminder) proc3Reminder.remove();
         
         // 若全部拒絕 (在第二步被攔截)
         if (gameState.acceptedFamilies === 0 && !gameState.gameFailed) {
@@ -129,9 +144,8 @@ function initScreen(id) {
             const g6Msg = document.getElementById('g6-msg');
             let msgHTML = '<p style="font-size:1.3em;"><strong>❌ 結局：未媒合到適合家庭</strong></p><div style="text-align: left; margin-top:15px; font-size: 0.95em;"><p><strong>【社工結案評估】</strong></p><p>你審慎評估後，認為目前的家庭都不適合收養這名特殊兒童，全部予以拒絕。</p>';
             
-            // 補充說明錯過 002 家庭的惋惜
             if (gameState.choices[1] === false) {
-                msgHTML += '<p style="color: #d35400; margin-top: 10px;"><strong>❗ 錯過 002 家庭的惋惜：</strong>其實 002 家庭具備極高的包容度與工作彈性，母親願意全職投入，且具備早療志工經驗。雖然長輩有微詞，但在不完美的現實中，這反而是特殊兒難得的避風港。可惜你放手了這個機會。</p>';
+                msgHTML += '<p style="color: #d35400; margin-top: 10px;"><strong>❗ 錯過 002 家庭的惋惜：</strong>其實 002 家庭具備極高的包容度與工作彈性，母親願意全職投入。在不完美的現實中，這反而是特殊兒難得的避風港。可惜你放手了這個機會。</p>';
             }
             
             msgHTML += '<p style="margin-top:10px;">孩子沒有找到家，只能繼續留在寄養體系中等待。隨著孩子年紀增長，這是一場沒有盡頭的消耗戰...</p></div>';
@@ -160,8 +174,6 @@ function initScreen(id) {
                 }
             });
             document.getElementById('g6-msg').classList.add('hidden');
-        const popup = document.getElementById('eval-form-popup');
-        if (popup) popup.classList.add('hidden');
         }
     }
 }
@@ -333,12 +345,9 @@ function renderCurrentCard() {
 
   if (gameState.currentCardIndex >= familyCases.length) {
     container.innerHTML = '';
+    
     document.getElementById('g4-action-btns').classList.add('hidden');
-
-    // 立即隱藏整個 game-g4 外框，避免純文字殘影
-    const g4 = document.getElementById('game-g4');
-    if (g4) { g4.classList.remove('active'); g4.classList.add('hidden'); }
-
+    
     if (gameState.acceptedFamilies === 0) {
         setTimeout(() => {
             stopAgeTimer();
@@ -444,14 +453,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 
-  // 統一連至報導（移除 #s3 讓頁面從最上方開始）
+  // ====== 點擊跳轉至完整報導網頁 ======
   document.querySelectorAll('.btn-to-stage-3').forEach(btn => {
     btn.addEventListener('click', () => {
       window.location.href = 'https://ceuwan1113-sys.github.io/05292/';
     });
   });
 
-  // 流程按鈕
   document.getElementById('btn-start-task')?.addEventListener('click', () => {
     navigateTo('stage-2', 'game-g3');
   });
@@ -469,28 +477,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnEval4 = document.getElementById('btn-eval-4');
   const btnG5ToG6 = document.getElementById('btn-g5-to-g6');
 
-  function showNarrative(id) {
-      const el = document.getElementById(id);
-      if (el) el.classList.remove('hidden');
-  }
-
   btnEval1?.addEventListener('click', () => {
       btnEval1.classList.add('btn-pressed');
-      gameState.childAgeMonths += 2; updateAgeDisplay();
+      gameState.childAgeMonths += 3; updateAgeDisplay();
       showNarrative('narrative-eval-1');
       if (btnEval2) { btnEval2.disabled = false; btnEval2.style.opacity = '1'; }
   });
 
   btnEval2?.addEventListener('click', () => {
       btnEval2.classList.add('btn-pressed');
-      gameState.childAgeMonths += 2; updateAgeDisplay();
+      gameState.childAgeMonths += 3; updateAgeDisplay();
       showNarrative('narrative-eval-2');
       if (btnEval3) { btnEval3.disabled = false; btnEval3.style.opacity = '1'; }
   });
 
   btnEval3?.addEventListener('click', () => {
       btnEval3.classList.add('btn-pressed');
-      gameState.childAgeMonths += 2; updateAgeDisplay();
+      gameState.childAgeMonths += 3; updateAgeDisplay();
       showNarrative('narrative-eval-3');
       if (btnEval4) { btnEval4.disabled = false; btnEval4.style.opacity = '1'; }
   });
@@ -518,32 +521,30 @@ document.addEventListener('DOMContentLoaded', () => {
   btnProc1?.addEventListener('click', () => {
       btnProc1.classList.add('btn-pressed');
       showNarrative('narrative-proc-1');
-      if (btnProc2) {
-          btnProc2.disabled = false;
-          btnProc2.style.opacity = '1';
-          // enable hover popup now that button is active
-          const popup = document.getElementById('eval-form-popup');
-          if (popup) popup.classList.remove('hidden');
-      }
+      if (btnProc2) { btnProc2.disabled = false; btnProc2.style.opacity = '1'; }
   });
 
   btnProc2?.addEventListener('click', () => {
       btnProc2.classList.add('btn-pressed');
       showNarrative('narrative-proc-2');
+      const popup = document.getElementById('eval-form-popup');
+      if (popup) { popup.classList.remove('hidden'); }
       if (btnProc3) { btnProc3.disabled = false; btnProc3.style.opacity = '1'; }
   });
 
   btnProc3?.addEventListener('click', () => {
       btnProc3.classList.add('btn-pressed');
-      // Show age reminder before outcome
+      
+      // 加入等待法院的時間 (動態插入文字)
       const ageYears = Math.floor(gameState.childAgeMonths / 12);
       const ageMons = gameState.childAgeMonths % 12;
-      const ageReminderEl = document.createElement('div');
-      ageReminderEl.className = 'eval-narrative';
-      ageReminderEl.style.maxWidth = '420px';
-      ageReminderEl.style.margin = '10px auto';
-      ageReminderEl.innerHTML = `⚖️ 聲請書送出，法院平均處理時間：3–6 個月。<br><strong style="color:#e74c3c;">孩子現在 ${ageYears} 歲 ${ageMons} 個月了。</strong>`;
-      btnProc3.parentElement.appendChild(ageReminderEl);
+      const proc3Reminder = document.createElement('div');
+      proc3Reminder.id = 'narrative-proc-3';
+      proc3Reminder.className = 'eval-narrative';
+      proc3Reminder.style.maxWidth = '420px';
+      proc3Reminder.style.margin = '10px auto';
+      proc3Reminder.innerHTML = `⚖️ 聲請書送出，法院平均處理時間：3–6 個月。<br><strong style="color:#e74c3c;">孩子現在 ${ageYears} 歲 ${ageMons} 個月了。</strong>`;
+      btnProc3.parentElement.appendChild(proc3Reminder);
       
       const isPerfectMatch = (gameState.choices[0] === false && gameState.choices[1] === true && gameState.choices[2] === false);
 
@@ -562,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   failReasons += '<p><strong>❌ 003 大家族企業：</strong>太太承受極大家族壓力，同住長輩對特殊狀況帶有偏見。孩子極易成為家族矛盾導火線，缺乏無條件接納的安全感。</p>';
               }
               if (gameState.choices[1] === false) {
-                  failReasons += '<p style="color: #d35400;"><strong>❗ 錯過 002 家庭的惋惜：</strong>其實 002 家庭具備極高的包容度與工作彈性，母親願意全職投入。在不完美的現實中，這反而是特殊兒難得的避風港。可惜你放手了這個機會。</p>';
+                  failReasons += '<p style="color: #d35400; margin-top: 10px;"><strong>❗ 錯過 002 家庭的惋惜：</strong>其實 002 家庭具備極高的包容度與工作彈性，母親願意全職投入。在不完美的現實中，這反而是特殊兒難得的避風港。可惜你放手了這個機會。</p>';
               }
               
               g6Msg.innerHTML = `<p style="font-size:1.3em; color:#e74c3c;"><strong>❌ 結局：收養宣告失敗</strong></p><div style="text-align: left; margin-top:15px; font-size: 0.95em;"><p><strong>【社工結案評估】</strong></p><p>試養與評估過程中發生嚴重適應問題，程序被迫終止：</p>${failReasons}<p style="margin-top:10px;">孩子只能退回安置體系，繼續漫長而未知的等待...</p></div>`;
