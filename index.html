@@ -68,13 +68,9 @@
                 <p>你是一名社工。<br>今天，你收到一個個案，這個小孩帶有特殊身心狀況，其母親委託出養。</p>
                 <p>根據國內優先原則，國內出養的黃金時期極為短暫。<br><strong style="color: #e74c3c; font-size: 1.1em;">請在孩子成長到 6 歲前，努力幫孩子尋家。</strong></p>
             </div>
-            <p style="font-size: 0.8em; color: #888; margin-bottom: 20px;">(可向上滑動或點擊左上角返回前頁)</p>
-            <div class="interaction-area">
-                <div class="scroll-prompt" id="btn-scroll-g1" style="cursor: pointer;">
-                    <span style="font-size: 1.5em;">👇</span><br>
-                    <strong>向下滑動，開始尋找親屬 (倒數開始)</strong>
-                </div>
-            </div>
+            <p style="font-size: 0.8em; color: #888; margin-bottom: 20px;">(可點擊左上角返回前頁)</p>
+            <br>
+            <button class="pixel-btn primary" id="btn-start-task">開始尋找親屬 ➔</button>
         </div>
 
         <!-- 第一步：尋找親屬 -->
@@ -156,19 +152,31 @@
             <button class="pixel-btn primary hidden" id="btn-g6-to-r">查看最終結局 ➔</button>
         </div>
 
-        <!-- R1：失敗結局 -->
-        <div id="game-r1" class="game-screen pixel-box error-state hidden text-center">
-            <h2>R1 結局：尋家失敗</h2>
-            <p>1. 孩子滿 6 歲了... 你錯過了合適的家庭。</p>
-            <p>2. 你沒能在黃金境內收養期內幫孩子找到家。在台灣，3歲以上的特殊兒童媒合率便會雪崩式下滑，滿 6 歲後，國內家庭的收養意願幾乎為零。</p>
+        <!-- 結局 R1：全部拒絕未媒合 -->
+        <div id="game-r-no-match" class="game-screen pixel-box error-state hidden text-center">
+            <h2>結局：未媒合到適合家庭</h2>
+            <p>你審慎評估後，認為目前的家庭都不適合收養這名特殊兒童，全部予以拒絕。</p>
+            <p>孩子沒有找到家，只能繼續留在寄養體系中等待。在台灣，隨著孩子年齡增長，國內家庭的收養意願幾乎為零，這是一場沒有盡頭的消耗戰...</p>
             <button class="pixel-btn primary btn-to-stage-3">閱讀完整報導</button>
         </div>
 
-        <!-- R2：成功結局 -->
+        <!-- 结局 R2：選擇錯誤 (001或003被選為適合) -->
+        <div id="game-r-wrong-choice" class="game-screen pixel-box error-state hidden text-center">
+            <h2>結局：收養宣告失敗</h2>
+            <p>你雖然為孩子配對了家庭，但在後續的評估與試養中，家庭的隱憂逐漸浮現，導致程序終止：</p>
+            <div style="text-align: left; background: #fff; padding: 15px; border: 2px dashed #e74c3c; margin-bottom: 15px; color: #333; font-size: 0.95em; max-width: 500px; margin-left: auto; margin-right: auto;">
+                <p style="margin-bottom: 10px;"><strong>❌ 001 高社經家庭：</strong>雖然經濟優渥，但父母處於高壓環境且無法親自陪伴。將醫療視為「修復」並期待孩子符合一般標準，會給特殊兒帶來極大壓力，缺乏真正的包容。</p>
+                <p><strong>❌ 003 大家族企業：</strong>主要照顧者承受龐大的傳宗接代壓力，且同住長輩對特殊狀況帶有偏見。在這種環境下，孩子極易成為家族矛盾的導火線，缺乏無條件接納的安全感。</p>
+            </div>
+            <p>孩子只能退回安置體系，繼續漫長而未知的等待...</p>
+            <button class="pixel-btn primary btn-to-stage-3">閱讀完整報導</button>
+        </div>
+
+        <!-- 結局 R3：成功找到家 (完美組合) -->
         <div id="game-r2" class="game-screen pixel-box success-state-border hidden text-center">
-            <h2>R2 結局：成功找到國內收養家庭</h2>
-            <p>你成功幫孩子找到家了！</p>
-            <p><strong>但在實際情況中，這只是少數...</strong></p>
+            <h2>結局：成功找到國內收養家庭</h2>
+            <p>你做出了最敏銳的判斷，成功幫孩子找到了充滿包容度與彈性的家！</p>
+            <p><strong>但在實際情況中，這只是少數的幸運...</strong></p>
             <p>還有許多特殊兒童被卡在體制的縫隙中，等待一個遙不可及的家。</p>
             <button class="pixel-btn primary btn-to-stage-3">閱讀完整報導</button>
         </div>
