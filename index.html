@@ -27,6 +27,10 @@
 </head>
 <body>
 
+<div id="global-back-btn" class="hidden" style="position: fixed; top: 15px; left: 15px; z-index: 1000; cursor: pointer; background: #fff; border: 2px solid #333; padding: 6px 14px; border-radius: 8px; font-weight: bold; box-shadow: 2px 2px 0px #333; transition: transform 0.1s;">
+    ⭠ 返回
+</div>
+
 <div id="app-container" style="text-align: center;">
 
     <section id="stage-1-result" class="screen-section active" style="min-height: 90vh; display: flex; flex-direction: column; justify-content: center; position: relative; text-align: center;">
@@ -47,14 +51,7 @@
     <section id="stage-2" class="screen-section hidden">
         <div class="game-hud pixel-box text-center">
             <span>個案年齡：<span id="child-age">1歲 0個月</span></span>
-            
-            <div class="warning-text hidden" id="age-warning" style="margin-top: 12px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px;">
-                <span style="color: #e74c3c; font-weight: bold; animation: flashWarning 1s infinite;">⚠ 3歲提醒：超過黃金收養期 ⚠</span>
-                <div class="tooltip-container">
-                    <span class="bulb-btn">💡 為何是3歲？</span>
-                    <span class="tooltip-text">小天使家園收出養組長蘇淑霞指出，「三歲」是收養媒合的重要分水嶺，如果不幫他們找家，孩子就很難出養。</span>
-                </div>
-            </div>
+            <span class="warning-text hidden" id="age-warning"><br>⚠ 3歲提醒：超過黃金收養期，媒合難度大幅提升 ⚠</span>
         </div>
 
         <div id="game-main" class="game-screen hidden pixel-box text-center">
@@ -106,87 +103,4 @@
 
         <div id="game-g5" class="game-screen pixel-box hidden text-center">
             <h2>第三步：進入審查評估</h2>
-            <p>每個被判斷適合收養的家庭，都要花時間做一系列的審查。<br>程序極度繁瑣，每推進一步，孩子就又長大了 3 個月...</p>
-            
-            <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0;">
-                <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-eval-1" style="width: 200px;">1. 上課 (+2個月)</button>
-                    <div class="eval-narrative hidden" id="narrative-eval-1">
-                        📋 收養準備課程共需完成 12 小時。第一次排定的週六上午，家庭臨時有事，改期。<br>等下一個梯次——要再等 6 週。
-                    </div>
-                </div>
-                <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-eval-2" disabled style="opacity: 0.5; width: 200px;">2. 會談 (+2個月)</button>
-                    <div class="eval-narrative hidden" id="narrative-eval-2">
-                        🗣️ 社工需分別對申請人進行深度訪談，評估動機與親職準備度。<br>預約排到兩個月後——社工同時管理 22 個個案。<br>孩子這個月學會叫「媽媽」了。
-                    </div>
-                </div>
-                <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-eval-3" disabled style="opacity: 0.5; width: 200px;">3. 家訪 (+2個月)</button>
-                    <div class="eval-narrative hidden" id="narrative-eval-3">
-                        🏠 社工到訪評估居家環境與同住成員態度。<br>家訪當天，家中突發急事，需重新安排。<br>改到下個月。報告寫完再送審，又是一個月。
-                    </div>
-                </div>
-                <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-eval-4" disabled style="opacity: 0.5; width: 200px;">4. 調查 (+3個月)</button>
-                    <div class="eval-narrative hidden" id="narrative-eval-4">
-                        🔍 背景調查報告送出，等待審查小組會議討論。<br>委員會每季召開一次——下次在三個月後。<br>終於，機構核定這個家庭「有條件通過」。
-                    </div>
-                </div>
-            </div>
-
-            <button class="pixel-btn primary hidden" id="btn-g5-to-g6">審查結束，進入第四步 ➔</button>
-        </div>
-
-        <div id="game-g6" class="game-screen pixel-box hidden text-center">
-            <h2 id="g6-title">第四步：進入收養程序</h2>
-            <p id="g6-subtitle">這是一條漫長的路，為了確保孩子的最佳利益，必須依次完成法定程序：</p>
-            
-            <div id="g6-process-buttons" style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0;">
-                <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-proc-1" style="width: 200px;">1. 試養</button>
-                    <div class="eval-narrative hidden" id="narrative-proc-1">
-                        🏡 孩子正式進入收養家庭試住，最短 6 個月。<br>前幾週孩子半夜常哭，家庭成員輪流安撫。<br>漸漸地，孩子開始叫他們「爸爸媽媽」。
-                    </div>
-                </div>
-                <div style="width: 100%; max-width: 420px;">
-                    <div class="tooltip-container" id="eval-form-trigger">
-                        <button class="pixel-btn process-btn" id="btn-proc-2" disabled style="opacity: 0.5; width: 200px;">2. 評估</button>
-                        <div class="eval-form-popup hidden" id="eval-form-popup">
-                            <div class="eval-form-title">📋 收養人評估表（節錄）</div>
-                            <table class="eval-table">
-                                <tr><th>評估項目</th><th>結果</th></tr>
-                                <tr><td>收養動機</td><td class="eval-ok">✓ 適當</td></tr>
-                                <tr><td>親職能力</td><td class="eval-pending">觀察中</td></tr>
-                                <tr><td>支持系統</td><td class="eval-pending">待確認</td></tr>
-                                <tr><td>兒童依附關係</td><td class="eval-pending">建立中</td></tr>
-                                <tr><td>同住成員態度</td><td class="eval-warn">⚠ 有疑慮</td></tr>
-                                <tr><td>居家環境</td><td class="eval-ok">✓ 適合</td></tr>
-                            </table>
-                            <p style="font-size:0.8em; color:#666; margin-top:8px;">每季評估一次，需社工、督導雙重確認</p>
-                        </div>
-                    </div>
-                    <div class="eval-narrative hidden" id="narrative-proc-2">
-                        📊 社工完成評估報告，送交督導審核。<br>「同住成員態度」列為觀察項目，需追蹤兩個月。<br>最終評估：建議繼續進行收養程序。
-                    </div>
-                </div>
-                <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-proc-3" disabled style="opacity: 0.5; width: 200px;">3. 法院聲請許可</button>
-                </div>
-            </div>
-
-            <div class="pixel-box-inner hidden" id="g6-msg" style="display: inline-block; max-width: 550px;"></div><br>
-
-            <div id="g6-end-actions" class="btn-group hidden" style="margin-top: 20px;">
-                <button class="pixel-btn primary" id="btn-replay-game">再玩一次</button>
-                <button class="pixel-btn secondary btn-to-stage-3">閱讀完整報導 ➔</button>
-            </div>
-        </div>
-
-    </section>
-
-</div>
-
-<script src="script.js"></script>
-</body>
-</html>
+            <p>每個被判
