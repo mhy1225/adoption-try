@@ -27,7 +27,9 @@ let gameState = {
   currentCardIndex: 0,
   acceptedFamilies: 0,
   rejectedFamilies: 0,
-  gameFailed: false
+  gameFailed: false,
+  choices: [], // 記錄每個家庭的選擇 (true/false)
+  finalResult: '' // 'success', 'wrong_choice', 'no_match'
 };
 
 let currentSectionId = 'stage-1-result';
@@ -110,6 +112,7 @@ function initScreen(id) {
         gameState.currentCardIndex = 0;
         gameState.acceptedFamilies = 0;
         gameState.rejectedFamilies = 0;
+        gameState.choices = []; // 重置選擇紀錄
         document.getElementById('g4-action-btns').classList.remove('hidden');
         document.getElementById('g4-complete-area').classList.add('hidden');
         renderCurrentCard();
@@ -152,7 +155,7 @@ function updateAgeDisplay() {
   if (gameState.childAgeMonths >= 72 && !gameState.gameFailed) {
     gameState.gameFailed = true;
     stopAgeTimer();
-    navigateTo('stage-2', 'game-r1'); // 直達失敗結局
+    navigateTo('stage-2', 'game-r-no-match'); 
   }
 }
 
@@ -223,8 +226,11 @@ function spawnSingleBubble(area) {
     bubble.addEventListener('mousedown', function onBubbleClick() {
         bubble.removeEventListener('mousedown', onBubbleClick);
         bubble.classList.add('popped');
-        stressLevel = Math.max(0, stressLevel - 5);
+        
+        // 點擊消除一次扣 25 點壓力
+        stressLevel = Math.max(0, stressLevel - 25);
         updateStressUI();
+        
         setTimeout(() => { if (area.contains(bubble)) bubble.remove(); }, 200);
     });
 
@@ -277,6 +283,17 @@ function renderCurrentCard() {
 
   if (gameState.currentCardIndex >= familyCases.length) {
     container.innerHTML = '';
+    
+    // 如果全都拒絕，直接跳到未媒合結局
+    if (gameState.acceptedFamilies === 0) {
+        document.getElementById('g4-action-btns').classList.add('hidden');
+        setTimeout(() => {
+            stopAgeTimer();
+            navigateTo('stage-2', 'game-r-no-match');
+        }, 500);
+        return;
+    }
+
     document.getElementById('g4-action-btns').classList.add('hidden');
     document.getElementById('g4-complete-area').classList.remove('hidden');
     return;
@@ -294,6 +311,9 @@ function renderCurrentCard() {
 function swipeCard(isAccepted) {
   const container = document.getElementById('family-cards-container');
   const card = container ? container.querySelector('.family-card') : null;
+
+  // 紀錄玩家的選擇
+  gameState.choices.push(isAccepted);
 
   if (card) {
     const stamp = document.createElement('div');
@@ -344,12 +364,9 @@ function swipeCard(isAccepted) {
 
 // ---------- 事件綁定與全局滾輪/滑動邏輯 ----------
 
-// 判定只在純閱讀畫面允許下滑切換下一頁
+// 判定只在首頁允許下滑切換下一頁
 function handleScrollNext() {
     if (currentSectionId === 'stage-1-result') navigateTo('stage-2', 'game-main');
-    else if (currentGameId === 'game-main') navigateTo('stage-2', 'game-g1');
-    else if (currentGameId === 'game-g1') navigateTo('stage-2', 'game-g3');
-    else if (currentGameId === 'game-g5') navigateTo('stage-2', 'game-g6');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -359,18 +376,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 首頁專用下滑按鈕
   document.getElementById('btn-scroll-down')?.addEventListener('click', () => navigateTo('stage-2', 'game-main'));
-  document.getElementById('btn-scroll-g1')?.addEventListener('click', () => navigateTo('stage-2', 'game-g1'));
 
-  // 電腦滾輪：上滑回前一頁，下滑往下一頁
+  // 電腦滾輪：上滑回前一頁，只允許在首頁下滑進遊戲
   window.addEventListener('wheel', (e) => {
       if (isNavigating) return;
-      if (currentSectionId === 'stage-3') return; // 第三階段長文保留原生滾動
+      if (currentSectionId === 'stage-3') return; 
       
-      if (e.deltaY < -30) goBack(); // 往上滾
-      else if (e.deltaY > 30) handleScrollNext(); // 往下滾
+      if (e.deltaY < -30) goBack(); 
+      else if (e.deltaY > 30) handleScrollNext(); 
   });
 
-  // 手機觸控：上滑回前一頁，下滑往下一頁
+  // 手機觸控：上滑回前一頁，只允許在首頁下滑進遊戲
   let touchStartY = 0;
   window.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
@@ -380,8 +396,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (currentSectionId === 'stage-3') return;
 
       const dy = touchStartY - e.changedTouches[0].clientY;
-      if (dy > 40) handleScrollNext(); // 往上滑動 (代表頁面往下)
-      else if (dy < -40) goBack(); // 往下滑動 (代表頁面往上)
+      if (dy > 40) handleScrollNext(); 
+      else if (dy < -40) goBack(); 
   });
 
   // 各種連結按鈕
@@ -391,11 +407,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  document.getElementById('btn-start-task')?.addEventListener('click', () => {
+    navigateTo('stage-2', 'game-g1');
+  });
+
   document.getElementById('btn-g1-next')?.addEventListener('click', () => navigateTo('stage-2', 'game-g3'));
   document.getElementById('btn-start-foster-game')?.addEventListener('click', startFosterGame);
-  document.getElementById('btn-g3-to-g4')?.addEventListener('click', () => {
-    navigateTo('stage-2', 'game-g4');
-  });
+  document.getElementById('btn-g3-to-g4')?.addEventListener('click', () => navigateTo('stage-2', 'game-g4'));
 
   document.getElementById('btn-g4-accept')?.addEventListener('click', () => swipeCard(true));
   document.getElementById('btn-g4-reject')?.addEventListener('click', () => swipeCard(false));
@@ -433,13 +451,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   btnProc3?.addEventListener('click', () => {
       btnProc3.classList.add('btn-pressed');
+      
+      // 成功判定：001不適合(false)、002適合(true)、003不適合(false)
+      const isPerfectMatch = (gameState.choices[0] === false && gameState.choices[1] === true && gameState.choices[2] === false);
+
       if (g6Msg && btnG6ToR) {
-          if (gameState.acceptedFamilies > 0) {
+          if (isPerfectMatch) {
               g6Msg.innerHTML = '<p><strong>🎉 恭喜！所有法定程序皆已完成，這個家庭非常適合收養孩子！</strong></p>';
               g6Msg.className = 'pixel-box-inner success-state';
+              gameState.finalResult = 'success';
           } else {
-              g6Msg.innerHTML = '<p><strong>❌ 沒有合適的家庭可進行程序，收養宣告失敗。</strong></p>';
+              g6Msg.innerHTML = '<p><strong>❌ 試養與評估過程中發生嚴重適應問題，程序終止。</strong></p>';
               g6Msg.className = 'pixel-box-inner error-state';
+              gameState.finalResult = 'wrong_choice';
           }
           g6Msg.classList.remove('hidden');
           btnG6ToR.classList.remove('hidden');
@@ -447,8 +471,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnG6ToR?.addEventListener('click', () => {
-    if (gameState.acceptedFamilies > 0) navigateTo('stage-2', 'game-r2');
-    else navigateTo('stage-2', 'game-r1');
+    if (gameState.finalResult === 'success') {
+        navigateTo('stage-2', 'game-r2');
+    } else {
+        navigateTo('stage-2', 'game-r-wrong-choice');
+    }
   });
 
 });
