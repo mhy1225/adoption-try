@@ -96,7 +96,7 @@ body {
   100% { opacity: 1; transform: translateY(0) rotate(0); }
 }
 
-/* --- 首頁下拉提示動畫 --- */
+/* --- 下拉提示動畫 --- */
 .scroll-prompt {
   animation: bounce 1.5s infinite;
   color: #333;
@@ -164,6 +164,27 @@ body {
   border: none;
   border-top: 3px dashed var(--color-text-muted);
   margin: 10px 0;
+}
+
+/* --- 新增：案件指派重點提示框 --- */
+.intro-highlight {
+  font-size: 1.3rem;
+  font-weight: 600;
+  line-height: 1.8;
+  color: #2c3e50;
+  background: #fefce8;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px dashed #d97706;
+  margin-bottom: 20px;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+  text-align: left;
+}
+.intro-highlight p {
+  margin-bottom: 10px;
+}
+.intro-highlight p:last-child {
+  margin-bottom: 0;
 }
 
 /* --- 剪紙卡片風格共用 --- */
@@ -322,36 +343,6 @@ input[type="range"]::-webkit-slider-thumb:hover {
   margin-top: 15px;
 }
 
-/* --- 結果頁 --- */
-.result-card {
-  text-align: center;
-  background: #fff;
-}
-
-.result-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 15px;
-  border-radius: 50%;
-  background: var(--color-accent-yellow);
-  border: 3px solid var(--color-text-primary);
-  box-shadow: 4px 4px 0px var(--color-text-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-}
-
-.result-title {
-  font-size: 1.6rem;
-  margin-bottom: 10px;
-  text-shadow: 1px 1px 0px #fff;
-}
-
-.result-description {
-  font-size: 1.1rem;
-}
-
 /* --- 比較長條圖 --- */
 .comparison-bar-track {
   height: 24px;
@@ -437,26 +428,26 @@ input[type="range"]::-webkit-slider-thumb:hover {
    ============================================ */
 .cards-container {
   position: relative;
-  height: 400px; /* 固定高度防止卡片塌陷 */
-  perspective: 1500px; /* 3D透視感 */
+  height: 400px; 
+  perspective: 1500px; 
 }
 
 /* 筆記本的 CSS 魔法 */
 .family-card {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
-  background-color: #fefce8 !important; /* 淡黃色紙張 */
+  background-color: #fefce8 !important; 
   background-image: 
-      linear-gradient(90deg, transparent 40px, #fca5a5 40px, #fca5a5 42px, transparent 42px), /* 紅色邊距線 */
-      linear-gradient(#e2e8f0 1px, transparent 1px) !important; /* 藍色橫線 */
+      linear-gradient(90deg, transparent 40px, #fca5a5 40px, #fca5a5 42px, transparent 42px), 
+      linear-gradient(#e2e8f0 1px, transparent 1px) !important; 
   background-size: 100% 100%, 100% 32px !important;
   background-position: 0 0, 0 8px !important;
   border: 2px solid #333 !important;
   border-radius: 4px 12px 12px 4px !important;
-  border-left: 15px solid #8b4513 !important; /* 咖啡色皮革書背 */
-  padding: 20px 20px 20px 55px !important; /* 將內文推過紅線 */
+  border-left: 15px solid #8b4513 !important; 
+  padding: 20px 20px 20px 55px !important; 
   box-shadow: 4px 4px 10px rgba(0,0,0,0.1) !important;
-  transform-origin: left center; /* 讓翻轉軸心位於左側書背 */
+  transform-origin: left center; 
   z-index: 10;
   transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1), opacity 0.5s ease-in-out;
 }
