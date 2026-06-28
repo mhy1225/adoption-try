@@ -45,7 +45,6 @@
 <body>
 <div id="app-container">
 
-    <!-- ========== Stage 1：猜測滑桿 ========== -->
     <section id="stage-1" class="screen-section active">
         <div class="pixel-box text-center">
             <h1>台灣國內特殊兒童收養</h1>
@@ -60,7 +59,6 @@
         </div>
     </section>
 
-    <!-- ========== Stage 1 結果 ========== -->
     <section id="stage-1-result" class="screen-section hidden">
         <div class="pixel-box text-center">
             <h2 id="result-feedback">現實，遠比數據沉重</h2>
@@ -74,14 +72,12 @@
         </div>
     </section>
 
-    <!-- ========== Stage 2：遊戲 ========== -->
     <section id="stage-2" class="screen-section hidden">
         <div class="game-hud pixel-box">
             <span>個案年齡：<span id="child-age">1歲 0個月</span></span>
             <span class="warning-text hidden" id="age-warning">⚠ 3歲提醒：媒合難度大幅提升 ⚠</span>
         </div>
 
-        <!-- 遊戲開場 -->
         <div id="game-main" class="game-screen active pixel-box">
             <h2>案件指派</h2>
             <p>你是一名社工。今天，你收到一個個案，這個小孩帶有特殊身心狀況，其母親委託出養。</p>
@@ -89,7 +85,6 @@
             <button class="pixel-btn" id="btn-start-task">開始遊戲</button>
         </div>
 
-        <!-- 第一步：尋找親屬 -->
         <div id="game-g1" class="game-screen pixel-box hidden">
             <h2>第一步：尋找親屬</h2>
             <div class="pixel-box-inner error-state">
@@ -99,12 +94,10 @@
             <button class="pixel-btn" id="btn-g1-next">安排進入寄養家庭 ➔</button>
         </div>
 
-        <!-- 第二步：寄養家庭生活 (10秒生存挑戰) -->
         <div id="game-g3" class="game-screen pixel-box hidden">
             <h2>第二步：寄養家庭的考驗</h2>
-            <p>孩子進入寄養家庭。但照顧特殊兒的壓力極大，突發狀況不斷。<br><strong>👉 請在 10 秒內點擊消除「突發狀況」，別讓壓力表爆滿！</strong></p>
+            <p>孩子進入寄養家庭。但照顧特殊兒的壓力極大，突發狀況不斷。<br><strong>👉 請在 10 秒內不斷點擊消除「狀況」，若壓力值達 100% 將導致安置失敗！</strong></p>
             
-            <!-- 壓力條 UI -->
             <div id="stress-meter-container" class="hidden">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
                     <span>寄養家庭壓力值</span>
@@ -116,12 +109,9 @@
                 <p id="game-timer-text" style="text-align: right; font-size: 0.9em; margin-top: 5px; color: #666;">剩餘時間：10 秒</p>
             </div>
 
-            <!-- 遊戲互動區 -->
             <div id="foster-game-area" class="pixel-box-inner hidden" style="height: 220px; position: relative; overflow: hidden; margin-top: 15px; background: #e5e7eb;">
-                <!-- JS 動態生成狀況泡泡 -->
-            </div>
+                </div>
 
-            <!-- 結算訊息 -->
             <div id="foster-result-msg" class="pixel-box-inner hidden"></div>
 
             <div class="text-center" style="margin-top: 15px;">
@@ -130,7 +120,6 @@
             </div>
         </div>
 
-        <!-- 第三步：介紹收養家庭 -->
         <div id="game-g4" class="game-screen pixel-box hidden">
             <h2>第三步：介紹收養家庭</h2>
             <p>請翻閱以下家庭檔案，評估是否適合收養這名特殊兒童。</p>
@@ -148,7 +137,6 @@
             </div>
         </div>
 
-        <!-- 第四步：審查評估 -->
         <div id="game-g5" class="game-screen pixel-box hidden">
             <h2>第四步：進入審查評估</h2>
             <p><strong>耗時增加：+<span id="g5-n-value">0</span> 乘以 3 個月</strong></p>
@@ -157,7 +145,6 @@
             <button class="pixel-btn" id="btn-g5-to-g6">審查結束，進入程序 ➔</button>
         </div>
 
-        <!-- 第五步：收養程序 -->
         <div id="game-g6" class="game-screen pixel-box hidden">
             <h2>第五步：進入收養程序 (倒計時停止)</h2>
             <p>這是一條漫長的路，為了確保孩子的最佳利益，必須依次完成法定程序：</p>
@@ -173,7 +160,6 @@
             <button class="pixel-btn primary hidden" id="btn-g6-to-r">查看最終結局 ➔</button>
         </div>
 
-        <!-- R1：失敗結局 -->
         <div id="game-r1" class="game-screen pixel-box error-state hidden">
             <h2>R1 結局：尋家失敗</h2>
             <p>1. 孩子滿 6 歲了... 你錯過了合適的家庭。</p>
@@ -181,7 +167,6 @@
             <button class="pixel-btn primary btn-to-stage-3">閱讀完整報導</button>
         </div>
 
-        <!-- R2：成功結局 -->
         <div id="game-r2" class="game-screen pixel-box success-state-border hidden">
             <h2>R2 結局：成功找到國內收養家庭</h2>
             <p>你成功幫孩子找到家了！</p>
@@ -191,7 +176,6 @@
         </div>
     </section>
 
-    <!-- ========== Stage 3：報導 ========== -->
     <section id="stage-3" class="screen-section hidden">
         <div class="parallax-section header-parallax">
             <div class="pixel-box">
