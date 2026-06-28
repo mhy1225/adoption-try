@@ -134,7 +134,6 @@ function endFosterGame(isWin) {
     document.getElementById('btn-g3-to-g4').classList.remove('hidden');
 }
 
-// 抽取單一生成泡泡的函式，確保一開始能跟壓力同步啟動
 function spawnSingleBubble(area) {
     const bubble = document.createElement('div');
     bubble.className = 'stress-bubble';
@@ -177,7 +176,6 @@ function startFosterGame() {
     
     const area = document.getElementById('foster-game-area');
     
-    // 倒數 10 秒
     countdownInterval = setInterval(() => {
         gameTimer--;
         document.getElementById('game-timer-text').innerText = `剩餘時間：${gameTimer} 秒`;
@@ -186,7 +184,6 @@ function startFosterGame() {
         }
     }, 1000);
 
-    // 每 33 毫秒增加 1 點壓力（相當於 1 秒均速精確增加 ~30 點）
     stressIncreaseInterval = setInterval(() => {
         stressLevel += 1;
         if (stressLevel >= 100) {
@@ -198,10 +195,8 @@ function startFosterGame() {
         }
     }, 33);
 
-    // 同時啟動第一顆泡泡
     spawnSingleBubble(area);
 
-    // 泡泡產生速度調至每0.2秒一顆，考驗極限手速
     spawnInterval = setInterval(() => {
         if (stressLevel >= 100 || gameTimer <= 0) return;
         spawnSingleBubble(area);
@@ -237,7 +232,6 @@ function swipeCard(isAccepted) {
   const card = container ? container.querySelector('.family-card') : null;
 
   if (card) {
-    // 產生審核印章
     const stamp = document.createElement('div');
     stamp.style.position = 'absolute';
     stamp.style.top = '40%';
@@ -265,13 +259,11 @@ function swipeCard(isAccepted) {
     }
     card.appendChild(stamp);
     
-    // 蓋章特效
     setTimeout(() => {
         stamp.style.opacity = '1';
         stamp.style.transform = 'translate(-50%, -50%) rotate(-5deg) scale(1)';
     }, 10);
 
-    // 0.6 秒後將整頁向左翻開
     setTimeout(() => {
         card.style.transform = 'rotateY(-130deg)';
         card.style.opacity = '0';
@@ -291,6 +283,7 @@ function swipeCard(isAccepted) {
 
 // ---------- 事件綁定與上下滑動控制 ----------
 let hasScrolledToGame = false;
+let hasStartedG1 = false; // 控制是否進入了遊戲的第一步(倒計時開始)
 
 function goToStage2() {
     if (hasScrolledToGame) return;
@@ -305,10 +298,18 @@ function goToStage1() {
     showScreen('stage-1-result');
 }
 
+function goToG1() {
+    if (hasStartedG1) return;
+    hasStartedG1 = true;
+    showGameScreen('game-g1');
+    startAgeTimer();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // --- 首頁下滑/上滑切換邏輯 ---
   document.getElementById('btn-scroll-down')?.addEventListener('click', goToStage2);
+  document.getElementById('btn-scroll-g1')?.addEventListener('click', goToG1);
 
   // 滑鼠滾輪
   window.addEventListener('wheel', (e) => {
@@ -317,12 +318,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const gameMain = document.getElementById('game-main');
 
       if (resultPage && resultPage.classList.contains('active')) {
-          if (e.deltaY > 15) { // 下滑進入遊戲
+          if (e.deltaY > 15) { // 下滑進入遊戲前導頁
               goToStage2();
           }
       } else if (stage2 && stage2.classList.contains('active') && gameMain && gameMain.classList.contains('active')) {
           if (e.deltaY < -15) { // 上滑回到首頁
               goToStage1();
+          } else if (e.deltaY > 15) { // 下滑正式進入第一步
+              goToG1();
           }
       }
   });
@@ -345,6 +348,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (stage2 && stage2.classList.contains('active') && gameMain && gameMain.classList.contains('active')) {
           if (touchEndY - touchStartY > 40) { // 畫面下移 (向上滑動)
               goToStage1();
+          } else if (touchStartY - touchEndY > 40) { // 向下滑動
+              goToG1();
           }
       }
   });
@@ -355,11 +360,6 @@ document.addEventListener('DOMContentLoaded', () => {
       showScreen('stage-3');
       window.scrollTo(0, 0);
     });
-  });
-
-  document.getElementById('btn-start-task')?.addEventListener('click', () => {
-    showGameScreen('game-g1');
-    startAgeTimer();
   });
 
   document.getElementById('btn-g1-next')?.addEventListener('click', () => {
