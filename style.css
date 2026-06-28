@@ -95,6 +95,19 @@ body {
   100% { opacity: 1; transform: translateY(0) rotate(0); }
 }
 
+/* --- 首頁下拉提示動畫 --- */
+.scroll-prompt {
+  animation: bounce 1.5s infinite;
+  color: #d97706;
+  display: inline-block;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
 /* --- 標籤 (Tag) --- */
 .tag {
   display: inline-flex;
@@ -507,7 +520,7 @@ input[type="range"]::-webkit-slider-thumb:hover {
 /* 點擊破裂的視覺特效 */
 .stress-bubble.popped {
   animation: popOut 0.2s ease-out forwards;
-  pointer-events: none; /* 防止動畫期間再次點擊 */
+  pointer-events: none; 
 }
 
 @keyframes popIn {
