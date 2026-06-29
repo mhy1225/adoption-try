@@ -173,6 +173,10 @@ function initScreen(id) {
                 }
             });
             document.getElementById('g6-msg').classList.add('hidden');
+            const popup2 = document.getElementById('eval-form-popup');
+            if (popup2) popup2.classList.add('hidden');
+            const evalBody = document.getElementById('eval-form-body');
+            if (evalBody) evalBody.innerHTML = '';
         }
     }
 }
@@ -337,7 +341,84 @@ function startFosterGame() {
     }, 200); 
 }
 
-// ---------- 第二步：卡片渲染 (筆記本風格) ----------
+// ---------- 第四步：收養人評估表（依第二步選擇動態產生）----------
+const familyEvalData = [
+  {
+    id: '001',
+    label: '高社經菁英家庭',
+    recommended: false, // 建議不適合
+    rows: [
+      { item: '收養動機',     result: '⚠ 有疑慮',  cls: 'eval-warn',    note: '以「擁有頂級資源」為由，忽視孩子情感需求' },
+      { item: '親職能力',     result: '待確認',     cls: 'eval-pending', note: '計劃全委保母照顧，缺乏直接親職參與' },
+      { item: '支持系統',     result: '⚠ 有疑慮',  cls: 'eval-warn',    note: '長輩傾向收養健康兒童，對特殊兒支持度低' },
+      { item: '兒童依附關係', result: '待觀察',     cls: 'eval-pending', note: '主要照顧者為保母，依附關係難以穩定建立' },
+      { item: '同住成員態度', result: '⚠ 有疑慮',  cls: 'eval-warn',    note: '長輩在國外，態度傾向不接受特殊需求' },
+      { item: '居家環境',     result: '✓ 適合',    cls: 'eval-ok',      note: '空間寬裕，醫療資源充足' },
+    ]
+  },
+  {
+    id: '002',
+    label: '雙薪彈性辦公家庭',
+    recommended: true, // 建議適合
+    rows: [
+      { item: '收養動機',     result: '✓ 適當',    cls: 'eval-ok',      note: '具早療志工經驗，理解特殊兒發展歷程' },
+      { item: '親職能力',     result: '✓ 良好',    cls: 'eval-ok',      note: '太太為主要照顧者，已研究早療資源' },
+      { item: '支持系統',     result: '觀察中',     cls: 'eval-pending', note: '長輩在外縣市，但已加入家長互助社群' },
+      { item: '兒童依附關係', result: '建立中',     cls: 'eval-pending', note: '試養初期反應良好，持續追蹤' },
+      { item: '同住成員態度', result: '✓ 支持',    cls: 'eval-ok',      note: '夫妻共識一致，長輩無強烈反對' },
+      { item: '居家環境',     result: '✓ 適合',    cls: 'eval-ok',      note: '住家鄰近早療機構與友善托育' },
+    ]
+  },
+  {
+    id: '003',
+    label: '傳統大家族企業',
+    recommended: false, // 建議不適合
+    rows: [
+      { item: '收養動機',     result: '⚠ 有疑慮',  cls: 'eval-warn',    note: '源於長輩傳宗接代壓力，非自主意願' },
+      { item: '親職能力',     result: '待確認',     cls: 'eval-pending', note: '太太為全職主婦，但主要照顧動機不明確' },
+      { item: '支持系統',     result: '✗ 不足',    cls: 'eval-warn',    note: '同住長輩對特殊兒有嚴重偏見，視為「業障」' },
+      { item: '兒童依附關係', result: '風險高',     cls: 'eval-warn',    note: '長輩負面態度將嚴重干擾依附關係建立' },
+      { item: '同住成員態度', result: '✗ 反對',    cls: 'eval-warn',    note: '公婆明確排斥，對主要照顧者施加極大壓力' },
+      { item: '居家環境',     result: '待評估',     cls: 'eval-pending', note: '透天別墅空間足夠，但家庭氣氛存有疑慮' },
+    ]
+  }
+];
+
+function buildEvalTable() {
+  const body = document.getElementById('eval-form-body');
+  if (!body) return;
+
+  // 只顯示玩家在第二步「判斷為適合」的家庭（即最終進入試養流程的）
+  // 若全部拒絕則不會到此步，故至少有一筆
+  const accepted = gameState.choices
+    .map((chosen, i) => chosen ? familyEvalData[i] : null)
+    .filter(Boolean);
+
+  // 若沒有被接受的（理論上不應發生），顯示全部
+  const toShow = accepted.length > 0 ? accepted : familyEvalData;
+
+  body.innerHTML = toShow.map(fam => {
+    const verdict = fam.recommended
+      ? `<span style="color:#16a34a;font-weight:bold;">✓ 建議通過</span>`
+      : `<span style="color:#dc2626;font-weight:bold;">✗ 建議不通過</span>`;
+
+    const rows = fam.rows.map(r =>
+      `<tr>
+        <td style="font-size:0.82em;">${r.item}</td>
+        <td class="${r.cls}" style="white-space:nowrap;">${r.result}</td>
+      </tr>`
+    ).join('');
+
+    return `
+      <div style="margin-bottom:12px;">
+        <div style="font-weight:bold;font-size:0.9em;margin-bottom:4px;text-align:left;">
+          檔案號 ${fam.id}・${fam.label}
+        </div>
+        <table class="eval-table">${rows}</table>
+        <div style="margin-top:5px;text-align:right;font-size:0.82em;">${verdict}</div>
+      </div>`;
+  }).join('<hr style="margin:10px 0;border-color:#e5e7eb;">');
+}
 function renderCurrentCard() {
   const container = document.getElementById('family-cards-container');
   if (!container) return;
@@ -535,6 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnProc2?.addEventListener('click', () => {
       btnProc2.classList.add('btn-pressed');
       showNarrative('narrative-proc-2');
+      buildEvalTable();
       const popup = document.getElementById('eval-form-popup');
       if (popup) popup.classList.remove('hidden');
       if (btnProc3) { btnProc3.disabled = false; btnProc3.style.opacity = '1'; }
