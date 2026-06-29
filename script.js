@@ -63,7 +63,7 @@ function navigateTo(secId, gameId = null) {
     currentGameId = gameId;
 
     initScreen(gameId);
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 
     setTimeout(() => isNavigating = false, 650); 
 }
@@ -74,11 +74,6 @@ function cleanupScreen(id) {
         clearInterval(countdownInterval);
         clearInterval(stressIncreaseInterval);
     }
-}
-
-function showNarrative(id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('hidden');
 }
 
 function initScreen(id) {
@@ -129,8 +124,6 @@ function initScreen(id) {
             const el = document.getElementById(nid);
             if (el) el.classList.add('hidden');
         });
-        
-        // 隱藏評估表單 (重置)
         const popup = document.getElementById('eval-form-popup');
         if (popup) popup.classList.add('hidden');
         const proc3Reminder = document.getElementById('narrative-proc-3');
@@ -177,6 +170,11 @@ function initScreen(id) {
             document.getElementById('g6-msg').classList.add('hidden');
         }
     }
+}
+
+function showNarrative(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
 }
 
 function showEndActions(replayText) {
@@ -346,8 +344,10 @@ function renderCurrentCard() {
 
   if (gameState.currentCardIndex >= familyCases.length) {
     container.innerHTML = '';
+    
     document.getElementById('g4-action-btns').classList.add('hidden');
     
+    // 如果全都拒絕，直接跳到結局
     if (gameState.acceptedFamilies === 0) {
         setTimeout(() => {
             stopAgeTimer();
@@ -430,14 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-scroll-down')?.addEventListener('click', () => navigateTo('stage-2', 'game-main'));
 
-  // 100% 解決無法下滑的終極方案：只要監聽到任何原生的 Scroll，且在首頁，就觸發跳轉
-  window.addEventListener('scroll', () => {
-      if (isNavigating) return;
-      if (currentSectionId === 'stage-1-result' && window.scrollY > 10) {
-          navigateTo('stage-2', 'game-main');
-      }
-  }, { passive: true });
-
   window.addEventListener('wheel', (e) => {
       if (isNavigating) return;
       if (currentSectionId === 'stage-1-result' && e.deltaY > 10) {
@@ -458,13 +450,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 
-  // ====== 點擊跳轉至完整報導網頁 ======
+  // 統一連至報導
   document.querySelectorAll('.btn-to-stage-3').forEach(btn => {
     btn.addEventListener('click', () => {
       window.location.href = 'https://ceuwan1113-sys.github.io/05292/';
     });
   });
 
+  // 流程按鈕
   document.getElementById('btn-start-task')?.addEventListener('click', () => {
     navigateTo('stage-2', 'game-g3');
   });
@@ -523,28 +516,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnProc3 = document.getElementById('btn-proc-3');
   const g6Msg = document.getElementById('g6-msg');
 
-  // 1. 點擊「試養」時，不跳評估表，只開啟第二個按鈕
   btnProc1?.addEventListener('click', () => {
       btnProc1.classList.add('btn-pressed');
       showNarrative('narrative-proc-1');
-      if (btnProc2) { 
-          btnProc2.disabled = false; 
-          btnProc2.style.opacity = '1'; 
+      if (btnProc2) {
+          btnProc2.disabled = false;
+          btnProc2.style.opacity = '1';
       }
   });
 
-  // 2. 點擊「評估」時，才顯示評估表 (popup) 以及下方的敘述
   btnProc2?.addEventListener('click', () => {
       btnProc2.classList.add('btn-pressed');
       showNarrative('narrative-proc-2');
-      
       const popup = document.getElementById('eval-form-popup');
       if (popup) { popup.classList.remove('hidden'); }
-      
       if (btnProc3) { btnProc3.disabled = false; btnProc3.style.opacity = '1'; }
   });
 
-  // 3. 點擊「法院聲請許可」時，進入結局
   btnProc3?.addEventListener('click', () => {
       btnProc3.classList.add('btn-pressed');
       
