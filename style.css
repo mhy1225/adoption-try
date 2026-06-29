@@ -77,14 +77,17 @@ body {
   60% { transform: translateY(-5px); }
 }
 
-/* --- 標題與文字 --- */
+/* --- 標題與文字 (支援 RWD 自適應縮放) --- */
 .headline {
   font-family: var(--font-display);
-  font-size: 2.2rem;
+  font-size: clamp(1.8rem, 6vw, 2.2rem);
   font-weight: 600;
   text-shadow: 2px 2px 0px #fff;
   line-height: 1.3;
 }
+h1 { font-size: clamp(1.8rem, 6vw, 2.2rem) !important; }
+h2 { font-size: clamp(1.4rem, 5vw, 1.8rem) !important; }
+p { font-size: clamp(0.95rem, 3vw, 1.1rem); }
 
 /* --- 剪紙卡片風格共用 --- */
 .pixel-box {
@@ -172,7 +175,8 @@ body {
   border-color: transparent #2c3e50 transparent transparent;
 }
 
-.tooltip-container:hover .tooltip-text {
+.tooltip-container:hover .tooltip-text,
+.tooltip-container:active .tooltip-text {
   visibility: visible;
   opacity: 1;
 }
@@ -196,25 +200,7 @@ body {
   background: #fefce8;
 }
 
-@media (max-width: 500px) {
-  .tooltip-text {
-    width: 200px;
-    left: auto;
-    right: 0;
-    top: 100%;
-    transform: translateY(0);
-    margin-left: 0;
-    margin-top: 10px;
-  }
-  .tooltip-text::after {
-    top: -16px;
-    right: 30px;
-    margin-top: 0;
-    border-color: transparent transparent #2c3e50 transparent;
-  }
-}
-
-/* --- 按鈕 --- */
+/* --- RWD：按鈕與流程選項 --- */
 .pixel-btn {
   display: inline-flex;
   align-items: center;
@@ -234,6 +220,12 @@ body {
   text-decoration: none;
   text-shadow: 1px 1px 0px rgba(0,0,0,0.3);
   margin: 5px;
+}
+
+.process-btn {
+  width: 100% !important;
+  max-width: 250px;
+  margin: 0 auto;
 }
 
 .pixel-btn:hover {
@@ -375,7 +367,6 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* 評估表 Popup（點擊評估後彈出） */
 .eval-form-popup {
   position: absolute;
   top: 50%;
@@ -400,7 +391,6 @@ body {
   to   { opacity: 1; transform: translate(0, -50%); }
 }
 
-/* 左側箭頭 */
 .eval-form-popup::after {
   content: '';
   position: absolute;
@@ -411,10 +401,46 @@ body {
   border-right-color: #333;
 }
 
-/* 手機版改回向上彈出 */
-@media (max-width: 700px) { 
+/* ============================================
+   手機版專屬 RWD 規則 (max-width: 600px)
+   ============================================ */
+@media (max-width: 600px) { 
+  .pixel-box { padding: 1rem; }
+  .pixel-btn { padding: 10px 16px; font-size: 1rem; }
+  
+  /* 手機版字體微調 */
+  .eval-narrative { font-size: 0.85em; }
+  
+  /* 加高手帳卡片避免手機換行爆框 */
+  .cards-container { height: 520px; }
+  .family-card { 
+      padding: 15px 15px 15px 35px !important; 
+      border-left: 10px solid #8b4513 !important; 
+  }
+  .notebook-title { font-size: 1.1em !important; line-height: 28px !important; }
+  .notebook-content { font-size: 0.9em !important; line-height: 28px !important; text-align: left !important; }
+
+  /* Tooltip 改為向下彈出防破版 */
+  .tooltip-text {
+    width: 220px;
+    left: 50%;
+    right: auto;
+    top: 100%;
+    transform: translateX(-50%);
+    margin-left: 0;
+    margin-top: 10px;
+  }
+  .tooltip-text::after {
+    top: -16px;
+    left: 50%;
+    right: auto;
+    margin-top: 0;
+    transform: translateX(-50%);
+    border-color: transparent transparent #2c3e50 transparent;
+  }
+
   .eval-form-popup {
-    width: 260px;
+    width: 250px;
     top: auto;
     bottom: calc(100% + 10px);
     left: 50%;
