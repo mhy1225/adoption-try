@@ -63,7 +63,8 @@ function navigateTo(secId, gameId = null) {
     currentGameId = gameId;
 
     initScreen(gameId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 回到頂部以防原生滾動錯位
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
     setTimeout(() => isNavigating = false, 650); 
 }
@@ -125,7 +126,6 @@ function initScreen(id) {
     if (id === 'game-g6') {
         document.getElementById('g6-end-actions').classList.add('hidden');
         
-        // 隱藏所有敘事與表格
         ['narrative-proc-1', 'narrative-proc-2'].forEach(nid => {
             const el = document.getElementById(nid);
             if (el) el.classList.add('hidden');
@@ -345,9 +345,12 @@ function renderCurrentCard() {
 
   if (gameState.currentCardIndex >= familyCases.length) {
     container.innerHTML = '';
-    
     document.getElementById('g4-action-btns').classList.add('hidden');
     
+    // 立即隱藏整個 game-g4 外框
+    const g4 = document.getElementById('game-g4');
+    if (g4) { g4.classList.remove('active'); g4.classList.add('hidden'); }
+
     if (gameState.acceptedFamilies === 0) {
         setTimeout(() => {
             stopAgeTimer();
@@ -424,8 +427,9 @@ function swipeCard(isAccepted) {
   }, 1100);
 }
 
-// ---------- 事件綁定與單向滑動邏輯 ----------
+// ---------- 事件綁定與防呆滾動邏輯 ----------
 
+// 判定只在首頁允許下滑切換下一頁
 function handleScrollNext() {
     if (currentSectionId === 'stage-1-result') navigateTo('stage-2', 'game-main');
 }
@@ -434,32 +438,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-scroll-down')?.addEventListener('click', () => navigateTo('stage-2', 'game-main'));
 
+  // 100% 解決無法下滑的終極方案：只要監聽到任何原生的 Scroll，且在首頁，就觸發跳轉
+  window.addEventListener('scroll', () => {
+      if (isNavigating) return;
+      // 只要稍微往下捲動一點點 (>10px)，就視為使用者想下滑
+      if (currentSectionId === 'stage-1-result' && window.scrollY > 10) {
+          navigateTo('stage-2', 'game-main');
+      }
+  }, { passive: true });
+
+  // 保留 wheel 以防在無法產生 native scroll 的大螢幕上
   window.addEventListener('wheel', (e) => {
       if (isNavigating) return;
-      if (currentSectionId === 'stage-1-result' && e.deltaY > 30) {
+      if (currentSectionId === 'stage-1-result' && e.deltaY > 10) {
           navigateTo('stage-2', 'game-main');
       }
   });
 
+  // 保留 touch 作為最後防線
   let touchStartY = 0;
   window.addEventListener('touchstart', (e) => {
       touchStartY = e.touches[0].clientY;
-  });
+  }, { passive: true });
+  
   window.addEventListener('touchend', (e) => {
       if (isNavigating) return;
       const dy = touchStartY - e.changedTouches[0].clientY;
-      if (currentSectionId === 'stage-1-result' && dy > 40) {
+      if (currentSectionId === 'stage-1-result' && dy > 20) {
           navigateTo('stage-2', 'game-main');
       }
   });
 
-  // ====== 點擊跳轉至完整報導網頁 ======
+  // 統一連至報導
   document.querySelectorAll('.btn-to-stage-3').forEach(btn => {
     btn.addEventListener('click', () => {
       window.location.href = 'https://ceuwan1113-sys.github.io/05292/';
     });
   });
 
+  // 流程按鈕
   document.getElementById('btn-start-task')?.addEventListener('click', () => {
     navigateTo('stage-2', 'game-g3');
   });
@@ -521,21 +538,23 @@ document.addEventListener('DOMContentLoaded', () => {
   btnProc1?.addEventListener('click', () => {
       btnProc1.classList.add('btn-pressed');
       showNarrative('narrative-proc-1');
-      if (btnProc2) { btnProc2.disabled = false; btnProc2.style.opacity = '1'; }
+      if (btnProc2) {
+          btnProc2.disabled = false;
+          btnProc2.style.opacity = '1';
+          const popup = document.getElementById('eval-form-popup');
+          if (popup) popup.classList.remove('hidden');
+      }
   });
 
   btnProc2?.addEventListener('click', () => {
       btnProc2.classList.add('btn-pressed');
       showNarrative('narrative-proc-2');
-      const popup = document.getElementById('eval-form-popup');
-      if (popup) { popup.classList.remove('hidden'); }
       if (btnProc3) { btnProc3.disabled = false; btnProc3.style.opacity = '1'; }
   });
 
   btnProc3?.addEventListener('click', () => {
       btnProc3.classList.add('btn-pressed');
       
-      // 加入等待法院的時間 (動態插入文字)
       const ageYears = Math.floor(gameState.childAgeMonths / 12);
       const ageMons = gameState.childAgeMonths % 12;
       const proc3Reminder = document.createElement('div');
