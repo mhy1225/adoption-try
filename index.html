@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>特殊兒童國內出養困境｜融媒體專題</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,17 +27,12 @@
 </head>
 <body>
 
-<!-- 全局返回按鈕 -->
-<div id="global-back-btn" class="hidden" style="position: fixed; top: 15px; left: 15px; z-index: 1000; cursor: pointer; background: #fff; border: 2px solid #333; padding: 6px 14px; border-radius: 8px; font-weight: bold; box-shadow: 2px 2px 0px #333; transition: transform 0.1s;">
-    ⭠ 返回
-</div>
-
 <div id="app-container" style="text-align: center;">
 
     <!-- ========== Stage 1：數據揭曉 (首頁) ========== -->
-    <section id="stage-1-result" class="screen-section active" style="min-height: 101vh; display: flex; flex-direction: column; justify-content: center; position: relative; text-align: center; padding-bottom: 50px;">
+    <section id="stage-1-result" class="screen-section active" style="min-height: 90vh; display: flex; flex-direction: column; justify-content: center; position: relative; text-align: center;">
         <div class="pixel-box text-center" style="margin-bottom: 40px; display: inline-block;">
-            <h1 id="result-feedback" style="color: #e74c3c; margin-bottom: 20px;">現實，遠比數據沉重</h1>
+            <h1 id="result-feedback" style="font-size: 2.2em; color: #e74c3c; margin-bottom: 20px;">現實，遠比數據沉重</h1>
             <p class="stats-compare" style="font-size: 1.2em;">2025 年只有 <strong>18% (13/77)</strong> 正在找家的特殊兒童，<br>在台灣順利找到屬於他的家。</p>
             <p style="margin-top: 15px; font-size: 0.95em; color: #555; line-height: 1.6;">大眾的預期往往相對樂觀，<br>但體制內的等待，卻是一場沒有盡頭的消耗戰。</p>
         </div>
@@ -80,7 +75,7 @@
             <h2>第一步：寄養家庭的考驗</h2>
             <p>親屬無力撫養，孩子進入寄養家庭。但照顧特殊兒的壓力極大，突發狀況不斷。<br><strong>👉 請在 10 秒內瘋狂點擊消除「狀況」，若壓力值達 100% 將導致安置失敗！</strong></p>
             
-            <div id="stress-meter-container" class="hidden" style="max-width: 400px; width: 95%; margin: 0 auto;">
+            <div id="stress-meter-container" class="hidden" style="max-width: 400px; margin: 0 auto;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold;">
                     <span>寄養家庭壓力值</span>
                     <span id="stress-text">0%</span>
@@ -106,7 +101,7 @@
             <h2>第二步：介紹收養家庭</h2>
             <p>請翻閱以下家庭檔案，評估是否適合收養這名特殊兒童。</p>
             
-            <div id="family-cards-container" class="cards-container"></div>
+            <div id="family-cards-container" class="cards-container" style="max-width: 500px; margin: 0 auto;"></div>
             
             <div class="btn-group" id="g4-action-btns" style="margin-top: 20px;">
                 <button class="pixel-btn primary" id="btn-g4-accept">⭕ 適合 (蓋章翻頁)</button>
@@ -117,31 +112,31 @@
         <!-- 第三步：審查評估 -->
         <div id="game-g5" class="game-screen pixel-box hidden text-center">
             <h2>第三步：進入審查評估</h2>
-            <p>每個被判斷適合收養的家庭，都要花時間做一系列的審查。<br>程序極度繁瑣，每推進一步，孩子就又長大了 3 個月...</p>
+            <p>每個被判斷適合收養的家庭，都要花時間做一系列的審查。<br>程序極度繁瑣，每推進一步，孩子就又長大了...</p>
             
             <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0;">
                 <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-eval-1">1. 上課 (+3個月)</button>
+                    <button class="pixel-btn process-btn" id="btn-eval-1" style="width: 200px;">1. 上課 (+3個月)</button>
                     <div class="eval-narrative hidden" id="narrative-eval-1">
-                        📋 收養準備課程共需完成 12 小時。第一次排定的週六上午，家庭臨時有事，改期。<br>等下一個梯次——要再等 6 週。
+                        📋 收養準備課程共需完成 12 小時。第一次排定的週六上午，家庭臨時有事，改期。<br>等下一個梯次——要再等 <strong>12 週</strong>。
                     </div>
                 </div>
                 <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-eval-2" disabled style="opacity: 0.5;">2. 會談 (+3個月)</button>
+                    <button class="pixel-btn process-btn" id="btn-eval-2" disabled style="opacity: 0.5; width: 200px;">2. 會談 (+3個月)</button>
                     <div class="eval-narrative hidden" id="narrative-eval-2">
-                        🗣️ 社工需分別對申請人進行深度訪談，評估動機與親職準備度。<br>預約排到兩個月後——社工同時管理 22 個個案。<br>孩子這個月學會叫「媽媽」了。
+                        🗣️ 社工需對申請人進行深度訪談，評估親職準備度。<br>預約排到 <strong>12 週後</strong>——社工同時管理 22 個個案。<br>孩子這個月學會叫「媽媽」了。
                     </div>
                 </div>
                 <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-eval-3" disabled style="opacity: 0.5;">3. 家訪 (+3個月)</button>
+                    <button class="pixel-btn process-btn" id="btn-eval-3" disabled style="opacity: 0.5; width: 200px;">3. 家訪 (+3個月)</button>
                     <div class="eval-narrative hidden" id="narrative-eval-3">
-                        🏠 社工到訪評估居家環境與同住成員態度。<br>家訪當天，家中突發急事，需重新安排。<br>改到下個月。報告寫完再送審，又是一個月。
+                        🏠 社工到訪評估居家環境與態度。<br>家訪當天家中突發急事，重新安排改到 <strong>4 週後</strong>。<br>報告寫完再送審，又花了 <strong>8 週</strong>。
                     </div>
                 </div>
                 <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-eval-4" disabled style="opacity: 0.5;">4. 審查小組會議 (+3個月)</button>
+                    <button class="pixel-btn process-btn" id="btn-eval-4" disabled style="opacity: 0.5; width: 200px;">4. 審查小組會議 (+3個月)</button>
                     <div class="eval-narrative hidden" id="narrative-eval-4">
-                        🔍 背景調查報告送出，等待審查小組會議討論。<br>委員會每季召開一次——下次在三個月後。<br>終於，機構核定這個家庭「有條件通過」。
+                        🔍 背景調查報告送出，等待審查小組會議討論。<br>委員會每季召開一次——下次在 <strong>12 週後</strong>。<br>終於，機構核定這個家庭「有條件通過」。
                     </div>
                 </div>
             </div>
@@ -157,16 +152,15 @@
             <div id="g6-process-buttons" style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 20px 0;">
                 
                 <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-proc-1">1. 試養</button>
+                    <button class="pixel-btn process-btn" id="btn-proc-1" style="width: 200px;">1. 試養</button>
                     <div class="eval-narrative hidden" id="narrative-proc-1">
                         🏡 孩子正式進入收養家庭試住，最短 6 個月。<br>前幾週孩子半夜常哭，家庭成員輪流安撫。<br>漸漸地，孩子開始叫他們「爸爸媽媽」。
                     </div>
                 </div>
                 
                 <div style="width: 100%; max-width: 420px; display: flex; flex-direction: column; align-items: center;">
-                    <div style="position: relative; width: 100%;">
-                        <button class="pixel-btn process-btn" id="btn-proc-2" disabled style="opacity: 0.5;">2. 評估</button>
-                        
+                    <div class="tooltip-container" id="eval-form-trigger" style="width: 100%;">
+                        <button class="pixel-btn process-btn" id="btn-proc-2" disabled style="opacity: 0.5; width: 200px;">2. 評估</button>
                         <!-- 點擊評估後才顯示的 Popup 表單 -->
                         <div class="eval-form-popup hidden" id="eval-form-popup">
                             <div class="eval-form-title">📋 收養人評估表（節錄）</div>
@@ -182,14 +176,13 @@
                             <p style="font-size:0.8em; color:#666; margin-top:8px; text-align:center;">每季評估一次，需社工雙重確認</p>
                         </div>
                     </div>
-                    
                     <div class="eval-narrative hidden" id="narrative-proc-2" style="width: 100%;">
                         📊 社工完成評估報告，送交督導審核。<br>「同住成員態度」列為觀察項目，需追蹤兩個月。<br>最終評估：建議繼續進行收養程序。
                     </div>
                 </div>
 
                 <div style="width: 100%; max-width: 420px;">
-                    <button class="pixel-btn process-btn" id="btn-proc-3" disabled style="opacity: 0.5;">3. 法院聲請許可</button>
+                    <button class="pixel-btn process-btn" id="btn-proc-3" disabled style="opacity: 0.5; width: 200px;">3. 法院聲請許可</button>
                 </div>
 
             </div>
