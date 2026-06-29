@@ -11,7 +11,7 @@ const familyCases = [
     { 
         id: 2, 
         title: "收養檔案號：002", 
-        content: "<strong>【雙薪彈性辦公家庭】</strong><br><strong>背景：</strong>先生（41歲）為遠距接案工程師，太太（39歲）為兼職會計。收入中等財務穩健。<br><strong>收養動機：</strong>結婚 8 年未生育，具備特殊兒早療志工經驗，理解「進步不是直線的」。<br><strong>支持系統：</strong>父親工時長，加班時間不固定，母親為全職家庭主婦是主要照顧人，也表明很願意花時間投入特殊兒的照顧。不過同住的公婆認為收養的小孩終究不是自家人，希望夫妻擁有自己的小孩。" 
+        content: "<strong>【雙薪彈性辦公家庭】</strong><br><strong>背景：</strong>先生（41歲）為科技業工程師，太太（39歲）為兼職會計。兩人收入中等但財務穩健。<br><strong>收養動機：</strong>結婚 8 年未生育，具備特殊兒早療志工經驗，理解「進步不是直線的」。<br><strong>支持系統：</strong>雙方長輩皆在外縣市，無法幫忙育兒，對於收養並無太大意見。先生工時長，目前正向公司爭取部分遠端辦公，太太會是主要照顧者。夫妻兩人已主動加入特殊兒家長互助社群，並確認住家附近有充足的早療資源與友善托育機構。" 
     },
     { 
         id: 3, 
@@ -74,6 +74,11 @@ function cleanupScreen(id) {
         clearInterval(countdownInterval);
         clearInterval(stressIncreaseInterval);
     }
+}
+
+function showNarrative(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('hidden');
 }
 
 function initScreen(id) {
@@ -139,7 +144,7 @@ function initScreen(id) {
             let msgHTML = '<p style="font-size:1.3em;"><strong>❌ 結局：未媒合到適合家庭</strong></p><div style="text-align: left; margin-top:15px; font-size: 0.95em;"><p><strong>【社工結案評估】</strong></p><p>你審慎評估後，認為目前的家庭都不適合收養這名特殊兒童，全部予以拒絕。</p>';
             
             if (gameState.choices[1] === false) {
-                msgHTML += '<p style="color: #d35400; margin-top: 10px;"><strong>❗ 錯過 002 家庭的惋惜：</strong>其實 002 家庭具備極高的包容度與工作彈性，母親願意全職投入。在不完美的現實中，這反而是特殊兒難得的避風港。可惜你放手了這個機會。</p>';
+                msgHTML += '<p style="color: #d35400; margin-top: 10px;"><strong>❗ 錯過 002 家庭的惋惜：</strong>其實 002 家庭具備極高的包容度，他們務實地盤點了早療與社群資源來彌補無後援的缺口，母親也願意全職投入。在不完美的現實中，這反而是特殊兒難得的避風港。可惜你放手了這個機會。</p>';
             }
             
             msgHTML += '<p style="margin-top:10px;">孩子沒有找到家，只能繼續留在寄養體系中等待。隨著孩子年紀增長，這是一場沒有盡頭的消耗戰...</p></div>';
@@ -170,11 +175,6 @@ function initScreen(id) {
             document.getElementById('g6-msg').classList.add('hidden');
         }
     }
-}
-
-function showNarrative(id) {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('hidden');
 }
 
 function showEndActions(replayText) {
@@ -344,10 +344,11 @@ function renderCurrentCard() {
 
   if (gameState.currentCardIndex >= familyCases.length) {
     container.innerHTML = '';
-    
     document.getElementById('g4-action-btns').classList.add('hidden');
     
-    // 如果全都拒絕，直接跳到結局
+    const g4 = document.getElementById('game-g4');
+    if (g4) { g4.classList.remove('active'); g4.classList.add('hidden'); }
+
     if (gameState.acceptedFamilies === 0) {
         setTimeout(() => {
             stopAgeTimer();
@@ -424,11 +425,18 @@ function swipeCard(isAccepted) {
   }, 1100);
 }
 
-// ---------- 事件綁定與單向滑動邏輯 ----------
+// ---------- 事件綁定與防呆滾動邏輯 ----------
 
 document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-scroll-down')?.addEventListener('click', () => navigateTo('stage-2', 'game-main'));
+
+  window.addEventListener('scroll', () => {
+      if (isNavigating) return;
+      if (currentSectionId === 'stage-1-result' && window.scrollY > 10) {
+          navigateTo('stage-2', 'game-main');
+      }
+  }, { passive: true });
 
   window.addEventListener('wheel', (e) => {
       if (isNavigating) return;
@@ -450,14 +458,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   });
 
-  // 統一連至報導
+  // ====== 點擊跳轉至完整報導網頁 ======
   document.querySelectorAll('.btn-to-stage-3').forEach(btn => {
     btn.addEventListener('click', () => {
       window.location.href = 'https://ceuwan1113-sys.github.io/05292/';
     });
   });
 
-  // 流程按鈕
   document.getElementById('btn-start-task')?.addEventListener('click', () => {
     navigateTo('stage-2', 'game-g3');
   });
@@ -529,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
       btnProc2.classList.add('btn-pressed');
       showNarrative('narrative-proc-2');
       const popup = document.getElementById('eval-form-popup');
-      if (popup) { popup.classList.remove('hidden'); }
+      if (popup) popup.classList.remove('hidden');
       if (btnProc3) { btnProc3.disabled = false; btnProc3.style.opacity = '1'; }
   });
 
@@ -551,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (g6Msg) {
           if (isPerfectMatch) {
               document.getElementById('g6-title').innerText = "最終結局";
-              g6Msg.innerHTML = '<p style="font-size:1.3em; color:#2ecc71;"><strong>🎉 恭喜！收養程序順利完成！</strong></p><div style="text-align: left; margin-top:15px; font-size: 0.95em;"><p><strong>【社工結案評估】</strong></p><p>你做出了最敏銳的判斷！002家庭雖然面臨長輩期待與工時的挑戰，但母親有全職投入的意願，且具備特殊兒志工經驗的包容度。在不完美的現實中，這已是孩子難得的避風港。</p></div>';
+              g6Msg.innerHTML = '<p style="font-size:1.3em; color:#2ecc71;"><strong>🎉 恭喜！收養程序順利完成！</strong></p><div style="text-align: left; margin-top:15px; font-size: 0.95em;"><p><strong>【社工結案評估】</strong></p><p>你做出了最敏銳的判斷！002家庭雖然沒有長輩後援且先生工時長，但他們務實地尋求外部資源，主動加入互助社群並盤點早療機構。母親有全職投入的意願，加上過往的志工經驗，讓他們能以務實且包容的心態接住孩子。在不完美的現實中，這已是孩子難得的避風港。</p></div>';
               g6Msg.className = 'pixel-box-inner success-state';
           } else {
               document.getElementById('g6-title').innerText = "最終結局";
@@ -563,7 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   failReasons += '<p><strong>❌ 003 大家族企業：</strong>太太承受極大家族壓力，同住長輩對特殊狀況帶有偏見。孩子極易成為家族矛盾導火線，缺乏無條件接納的安全感。</p>';
               }
               if (gameState.choices[1] === false) {
-                  failReasons += '<p style="color: #d35400; margin-top: 10px;"><strong>❗ 錯過 002 家庭的惋惜：</strong>其實 002 家庭具備極高的包容度與工作彈性，母親願意全職投入。在不完美的現實中，這反而是特殊兒難得的避風港。可惜你放手了這個機會。</p>';
+                  failReasons += '<p style="color: #d35400; margin-top: 10px;"><strong>❗ 錯過 002 家庭的惋惜：</strong>其實 002 家庭具備極高的包容度，他們務實地盤點了早療與社群資源來彌補無後援的缺口，母親也願意全職投入。在不完美的現實中，這反而是特殊兒難得的避風港。可惜你放手了這個機會。</p>';
               }
               
               g6Msg.innerHTML = `<p style="font-size:1.3em; color:#e74c3c;"><strong>❌ 結局：收養宣告失敗</strong></p><div style="text-align: left; margin-top:15px; font-size: 0.95em;"><p><strong>【社工結案評估】</strong></p><p>試養與評估過程中發生嚴重適應問題，程序被迫終止：</p>${failReasons}<p style="margin-top:10px;">孩子只能退回安置體系，繼續漫長而未知的等待...</p></div>`;
